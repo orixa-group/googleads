@@ -53,6 +53,10 @@ func Connect(ctx context.Context, config Config) (*Client, error) {
 	return &Client{conn}, nil
 }
 
+func (c *Client) CampaignBudget() *CampaignBudgetService {
+	return NewCampaignBudgetService(c.conn)
+}
+
 func (c *Client) Close() error {
 	return c.conn.Close()
 }
