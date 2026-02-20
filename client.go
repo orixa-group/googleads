@@ -23,18 +23,13 @@ type Config struct {
 	LoginCustomerID string
 }
 
-// Client is the interface for the Google Ads API client.
-type Client interface {
-	// Close closes the connection to the Google Ads API.
-	Close() error
-}
-
-type client struct {
+// Client is the struct that represents the Google Ads API client.
+type Client struct {
 	conn *grpc.ClientConn
 }
 
 // Connect creates a new Google Ads API client.
-func Connect(ctx context.Context, config Config) (Client, error) {
+func Connect(ctx context.Context, config Config) (*Client, error) {
 	oauthConfig := &oauth2.Config{
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
@@ -55,10 +50,10 @@ func Connect(ctx context.Context, config Config) (Client, error) {
 		return nil, fmt.Errorf("failed to connect to Google Ads: %w", err)
 	}
 
-	return &client{conn}, nil
+	return &Client{conn}, nil
 }
 
-func (c *client) Close() error {
+func (c *Client) Close() error {
 	return c.conn.Close()
 }
 

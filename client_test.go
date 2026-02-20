@@ -111,12 +111,7 @@ func TestConnect(t *testing.T) {
 		t.Fatal("Connect returned nil client")
 	}
 
-	c, ok := cClient.(*client)
-	if !ok {
-		t.Fatal("client does not satisfy internal client struct")
-	}
-
-	if c.conn == nil {
+	if cClient.conn == nil {
 		t.Fatal("client connection is nil")
 	}
 }
