@@ -57,6 +57,10 @@ func (c *Client) CampaignBudget() *CampaignBudgetService {
 	return NewCampaignBudgetService(c.conn)
 }
 
+func (c *Client) Campaign() *CampaignService {
+	return NewCampaignService(c.conn)
+}
+
 func (c *Client) Close() error {
 	return c.conn.Close()
 }
