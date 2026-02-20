@@ -3,7 +3,6 @@ package googleads
 import (
 	"context"
 
-	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
 	"google.golang.org/grpc"
 )
@@ -24,12 +23,12 @@ func (s *CampaignService) List(ctx context.Context, customerId string, filters .
 	return List(ctx, services.NewGoogleAdsServiceClient(s.conn), customerId, NewCampaignQueryBuilder().Where(filters...).Build(), s.createInstance)
 }
 
-func (s *CampaignService) Create(ctx context.Context, customerId string, req *resources.Campaign) (*Campaign, error) {
+func (s *CampaignService) Create(ctx context.Context, customerId string, req *Campaign) (*Campaign, error) {
 	return Create(ctx, services.NewCampaignServiceClient(s.conn).MutateCampaigns, &services.MutateCampaignsRequest{
 		CustomerId: customerId,
 		Operations: []*services.CampaignOperation{
 			{
-				Operation: &services.CampaignOperation_Create{Create: req},
+				Operation: &services.CampaignOperation_Create{Create: req.Campaign},
 			},
 		},
 	}, func(customerId string, res *services.MutateCampaignsResponse) string {
