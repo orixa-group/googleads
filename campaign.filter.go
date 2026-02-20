@@ -2,7 +2,7 @@ package googleads
 
 import "fmt"
 
-type CampaignFilter func() string
+type CampaignFilter Filter
 
 func CampaignById(id string) CampaignFilter {
 	return func() string {

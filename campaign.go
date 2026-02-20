@@ -1,7 +1,6 @@
 package googleads
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/shenzhencenter/google-ads-pb/enums"
@@ -50,19 +49,9 @@ func (c *Campaign) SetEnabled(enabled bool) {
 }
 
 func (c Campaign) GetBudget() int {
-	return c.Budget.GetAmount()
+	return c.Budget.GetAmountCents()
 }
 
 func (c *Campaign) SetBudget(budget int) {
-	c.Budget.SetAmount(budget)
-}
-
-func (c *Campaign) Create(ctx context.Context, client *Client, customerId string) error {
-	new, err := client.Campaign().Create(ctx, customerId, c.Campaign)
-	if err != nil {
-		return err
-	}
-
-	*c = *new
-	return nil
+	c.Budget.SetAmountCents(budget)
 }
