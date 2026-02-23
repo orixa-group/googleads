@@ -57,6 +57,10 @@ func (c *Client) CampaignBudgets() *CampaignBudgetService {
 	return NewCampaignBudgetService(c.conn)
 }
 
+func (c *Client) GoogleAds() *GoogleAdsService {
+	return NewGoogleAdsService(c.conn)
+}
+
 func (c *Client) Campaigns() *CampaignService {
 	return NewCampaignService(c.conn)
 }
