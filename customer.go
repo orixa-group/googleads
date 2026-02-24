@@ -22,3 +22,7 @@ func (c Customer) GetId() string {
 func (c Customer) ListCampaigns(ctx context.Context) (Campaigns, error) {
 	return ListCampaigns(ctx, c.GetId())
 }
+
+func (c Customer) FetchCampaign(ctx context.Context, id string) (*Campaign, error) {
+	return FetchCampaign(ctx, c.GetId(), CampaignById(id))
+}
