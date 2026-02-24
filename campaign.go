@@ -11,6 +11,7 @@ type Campaign struct {
 	*resources.Campaign
 	Budget   *CampaignBudget
 	Criteria CampaignCriteria
+	Customer *Customer
 }
 
 func NewCampaign() *Campaign {
@@ -18,6 +19,7 @@ func NewCampaign() *Campaign {
 		Campaign: &resources.Campaign{},
 		Budget:   NewCampaignBudget(),
 		Criteria: NewCampaignCriteria(),
+		Customer: NewCustomer(),
 	}
 }
 

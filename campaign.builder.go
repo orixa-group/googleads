@@ -6,10 +6,11 @@ type CampaignQueryBuilder struct {
 
 func NewCampaignQueryBuilder() *CampaignQueryBuilder {
 	budget := NewCampaignBudgetQueryBuilder()
+	customer := NewCustomerQueryBuilder()
 
 	return &CampaignQueryBuilder{NewQueryBuilder[CampaignFilter]().
 		Select(
-			append(budget.fields,
+			append(append(budget.fields, customer.fields...),
 				"campaign.video_campaign_settings.video_ad_sequence.steps",
 				"campaign.video_campaign_settings.video_ad_sequence.minimum_duration",
 				"campaign.video_campaign_settings.video_ad_inventory_control.allow_shorts",

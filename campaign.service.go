@@ -31,5 +31,6 @@ func createCampaignInstance(row *services.GoogleAdsRow) *Campaign {
 	return &Campaign{
 		Campaign: row.GetCampaign(),
 		Budget:   &CampaignBudget{row.GetCampaignBudget()},
+		Customer: &Customer{row.GetCustomer()},
 	}
 }
