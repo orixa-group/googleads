@@ -1,6 +1,7 @@
 package googleads
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/shenzhencenter/google-ads-pb/enums"
@@ -59,3 +60,9 @@ func (c Campaign) GetBudget() int {
 func (c *Campaign) SetBudget(budget int) {
 	c.Budget.SetAmountCents(budget)
 }
+
+func (c Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
+	return ListCampaignCriteria(ctx, c.Customer.GetId(), CampaignCriterionByCampaign(c.GetResourceName()))
+}
+
+type Campaigns []*Campaign
