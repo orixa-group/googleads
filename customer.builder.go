@@ -1,11 +1,11 @@
 package googleads
 
 type CustomerQueryBuilder struct {
-	*QueryBuilder[CustomerFilter]
+	*QueryBuilder[Filter]
 }
 
 func NewCustomerQueryBuilder() *CustomerQueryBuilder {
-	return &CustomerQueryBuilder{NewQueryBuilder[CustomerFilter]().
+	return &CustomerQueryBuilder{NewQueryBuilder[Filter]().
 		Select(
 			"customer.video_customer.third_party_integration_partners.viewability_integration_partners",
 			"customer.video_customer.third_party_integration_partners.reach_integration_partners",
@@ -46,9 +46,4 @@ func NewCustomerQueryBuilder() *CustomerQueryBuilder {
 			"customer.auto_tagging_enabled",
 		).
 		From("customer")}
-}
-
-func (b *CustomerQueryBuilder) Where(clauses ...CustomerFilter) *CustomerQueryBuilder {
-	b.QueryBuilder.Where(clauses...)
-	return b
 }

@@ -2,18 +2,15 @@ package googleads
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/shenzhencenter/google-ads-pb/services"
 )
 
-func FetchCustomer(ctx context.Context, customerId string, filters ...CustomerFilter) (*Customer, error) {
-	return Fetch(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCustomerQueryBuilder().Where(filters...).Build(), createCustomerInstance)
-}
-
-func ListCustomers(ctx context.Context, customerId string, filters ...CustomerFilter) ([]*Customer, error) {
-	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCustomerQueryBuilder().Where(filters...).Build(), createCustomerInstance)
-}
-
-func createCustomerInstance(row *services.GoogleAdsRow) *Customer {
-	return &Customer{row.GetCustomer()}
+func FetchCustomer(ctx context.Context, id string) (*Customer, error) {
+	return Fetch(ctx, services.NewGoogleAdsServiceClient(instance.conn), id, NewCustomerQueryBuilder().Where(func() string {
+		return fmt.Sprintf("customer.id = '%s'", id)
+	}).Build(), func(row *services.GoogleAdsRow) *Customer {
+		return &Customer{row.GetCustomer()}
+	})
 }
