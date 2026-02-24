@@ -9,13 +9,15 @@ import (
 
 type Campaign struct {
 	*resources.Campaign
-	Budget *CampaignBudget
+	Budget   *CampaignBudget
+	Criteria CampaignCriteria
 }
 
 func NewCampaign() *Campaign {
 	return &Campaign{
 		Campaign: &resources.Campaign{},
 		Budget:   NewCampaignBudget(),
+		Criteria: NewCampaignCriteria(),
 	}
 }
 
