@@ -23,13 +23,15 @@ type Config struct {
 	LoginCustomerID string
 }
 
-// Client is the struct that represents the Google Ads API client.
-type Client struct {
+var instance *client
+
+// client is the struct that represents the Google Ads API client.
+type client struct {
 	conn *grpc.ClientConn
 }
 
 // Connect creates a new Google Ads API client.
-func Connect(ctx context.Context, config Config) (*Client, error) {
+func Connect(ctx context.Context, config Config) error {
 	oauthConfig := &oauth2.Config{
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
@@ -47,26 +49,18 @@ func Connect(ctx context.Context, config Config) (*Client, error) {
 		}),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to Google Ads: %w", err)
+		return fmt.Errorf("failed to connect to Google Ads: %w", err)
 	}
 
-	return &Client{conn}, nil
+	instance = &client{conn}
+	return nil
 }
 
-func (c *Client) CampaignBudgets() *CampaignBudgetService {
-	return NewCampaignBudgetService(c.conn)
-}
-
-func (c *Client) GoogleAds() *GoogleAdsService {
-	return NewGoogleAdsService(c.conn)
-}
-
-func (c *Client) Campaigns() *CampaignService {
-	return NewCampaignService(c.conn)
-}
-
-func (c *Client) Close() error {
-	return c.conn.Close()
+func Close() error {
+	if instance == nil {
+		return nil
+	}
+	return instance.conn.Close()
 }
 
 type credentials struct {
@@ -95,4 +89,16 @@ func (c *credentials) GetRequestMetadata(ctx context.Context, uri ...string) (ma
 
 func (c *credentials) RequireTransportSecurity() bool {
 	return true
+}
+
+func CampaignBudgets() *CampaignBudgetService {
+	return NewCampaignBudgetService(instance.conn)
+}
+
+func GoogleAds() *GoogleAdsService {
+	return NewGoogleAdsService(instance.conn)
+}
+
+func Campaigns() *CampaignService {
+	return NewCampaignService(instance.conn)
 }

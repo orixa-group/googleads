@@ -101,17 +101,17 @@ func TestConnect(t *testing.T) {
 		LoginCustomerID: "login-id",
 	}
 
-	cClient, err := Connect(ctx, config)
+	err := Connect(ctx, config)
 	if err != nil {
 		t.Fatalf("Connect failed: %v", err)
 	}
-	defer cClient.Close()
+	defer Close()
 
-	if cClient == nil {
-		t.Fatal("Connect returned nil client")
+	if instance == nil {
+		t.Fatal("Connect did not initialize instance")
 	}
 
-	if cClient.conn == nil {
+	if instance.conn == nil {
 		t.Fatal("client connection is nil")
 	}
 }

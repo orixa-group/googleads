@@ -33,11 +33,11 @@ config := googleads.Config{
 
 ```go
 ctx := context.Background()
-client, err := googleads.Connect(ctx, config)
+err := googleads.Connect(ctx, config)
 if err != nil {
     log.Fatal(err)
 }
-defer client.Close()
+defer googleads.Close()
 ```
 
 ### Working with Campaigns
@@ -45,7 +45,7 @@ defer client.Close()
 #### Listing Campaigns
 
 ```go
-campaigns, err := client.Campaigns().List(ctx, "CUSTOMER_ID")
+campaigns, err := googleads.Campaigns().List(ctx, "CUSTOMER_ID")
 if err != nil {
     log.Fatal(err)
 }
@@ -65,7 +65,7 @@ campaign := googleads.NewCampaign()
 campaign.SetName("Summer Sale 2024")
 campaign.SetBudget(1000) // Amount in cents
 
-budget, err := client.CampaignBudgets().Create(ctx, "CUSTOMER_ID", campaign.Budget)
+budget, err := googleads.CampaignBudgets().Create(ctx, "CUSTOMER_ID", campaign.Budget)
 if err != nil {
     log.Fatal(err)
 }
@@ -74,7 +74,7 @@ if err != nil {
 campaign.SetEnabled(true)
 campaign.CampaignBudget = googleads.String(budget.GetResourceName())
 
-createdCampaign, err := client.Campaigns().Create(ctx, "CUSTOMER_ID", campaign)
+createdCampaign, err := googleads.Campaigns().Create(ctx, "CUSTOMER_ID", campaign)
 if err != nil {
     log.Fatal(err)
 }
@@ -86,7 +86,7 @@ fmt.Printf("Created campaign with ID: %s\n", createdCampaign.GetId())
 #### Fetching a Budget
 
 ```go
-budget, err := client.CampaignBudgets().Fetch(ctx, "CUSTOMER_ID", googleads.CampaignBudgetById("456"))
+budget, err := googleads.CampaignBudgets().Fetch(ctx, "CUSTOMER_ID", googleads.CampaignBudgetById("456"))
 if err != nil {
     log.Fatal(err)
 }
