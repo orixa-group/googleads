@@ -90,15 +90,3 @@ func (c *credentials) GetRequestMetadata(ctx context.Context, uri ...string) (ma
 func (c *credentials) RequireTransportSecurity() bool {
 	return true
 }
-
-func CampaignBudgets() *CampaignBudgetService {
-	return NewCampaignBudgetService(instance.conn)
-}
-
-func GoogleAds() *GoogleAdsService {
-	return NewGoogleAdsService(instance.conn)
-}
-
-func Campaigns() *CampaignService {
-	return NewCampaignService(instance.conn)
-}
