@@ -15,6 +15,7 @@ type Campaign struct {
 	Budget   *CampaignBudget
 	Criteria CampaignCriteria
 	Customer *Customer
+	Assets   CampaignAssets
 }
 
 func NewCampaign() *Campaign {
@@ -23,6 +24,7 @@ func NewCampaign() *Campaign {
 		Budget:   NewCampaignBudget(),
 		Criteria: NewCampaignCriteria(),
 		Customer: NewCustomer(),
+		Assets:   NewCampaignAssets(),
 	}
 }
 
@@ -74,12 +76,16 @@ func (c *Campaign) ListAssets(ctx context.Context) (CampaignAssets, error) {
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 	tempId := newTempIdGenerator()
 
+	ops := make([]*services.MutateOperation, 0)
+
+	ops = append(ops, c.Budget.createOperation(customer, tempId))
+	ops = append(ops, c.createOperation(customer, c.Budget, tempId))
+	ops = append(ops, c.Criteria.createOperations(c)...)
+	ops = append(ops, c.Assets.createOperations(c)...)
+
 	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
-		CustomerId: customer.GetId(),
-		MutateOperations: append([]*services.MutateOperation{
-			c.Budget.createOperation(customer, tempId),
-			c.createOperation(customer, c.Budget, tempId),
-		}, c.Criteria.createOperations(c)...),
+		CustomerId:       customer.GetId(),
+		MutateOperations: ops,
 	})
 	return err
 }
