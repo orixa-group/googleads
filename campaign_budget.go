@@ -1,9 +1,11 @@
 package googleads
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/shenzhencenter/google-ads-pb/resources"
+	"github.com/shenzhencenter/google-ads-pb/services"
 )
 
 type CampaignBudget struct {
@@ -26,4 +28,18 @@ func (c CampaignBudget) GetAmountCents() int {
 
 func (c *CampaignBudget) SetAmountCents(amount int) {
 	c.CampaignBudget.AmountMicros = Int64(int64(amount * 10_000))
+}
+
+func (c *CampaignBudget) createOperation(customer *Customer, tempId tempIdGenerator) *services.MutateOperation {
+	c.ResourceName = fmt.Sprintf("customers/%s/campaignBudgets/%s", customer.GetId(), tempId())
+
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_CampaignBudgetOperation{
+			CampaignBudgetOperation: &services.CampaignBudgetOperation{
+				Operation: &services.CampaignBudgetOperation_Create{
+					Create: c.CampaignBudget,
+				},
+			},
+		},
+	}
 }

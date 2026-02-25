@@ -3,6 +3,7 @@ package googleads
 import (
 	"github.com/shenzhencenter/google-ads-pb/common"
 	"github.com/shenzhencenter/google-ads-pb/resources"
+	"github.com/shenzhencenter/google-ads-pb/services"
 )
 
 type CampaignCriterion struct {
@@ -12,6 +13,20 @@ type CampaignCriterion struct {
 func NewCampaignCriterion() *CampaignCriterion {
 	return &CampaignCriterion{
 		CampaignCriterion: &resources.CampaignCriterion{},
+	}
+}
+
+func (c *CampaignCriterion) createOperation(campaign *Campaign) *services.MutateOperation {
+	c.Campaign = String(campaign.GetResourceName())
+
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_CampaignCriterionOperation{
+			CampaignCriterionOperation: &services.CampaignCriterionOperation{
+				Operation: &services.CampaignCriterionOperation_Create{
+					Create: c.CampaignCriterion,
+				},
+			},
+		},
 	}
 }
 
@@ -39,4 +54,10 @@ func (c CampaignCriteria) AddKeyword(keyword string, matchType KeywordMatchType)
 			Keyword: k,
 		},
 	}})
+}
+
+func (c CampaignCriteria) createOperations(campaign *Campaign) []*services.MutateOperation {
+	return Map(c, func(item *CampaignCriterion) *services.MutateOperation {
+		return item.createOperation(campaign)
+	})
 }

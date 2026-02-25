@@ -2,10 +2,12 @@ package googleads
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
+	"github.com/shenzhencenter/google-ads-pb/services"
 )
 
 type Campaign struct {
@@ -63,6 +65,34 @@ func (c *Campaign) SetBudget(budget int) {
 
 func (c Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
 	return ListCampaignCriteria(ctx, c.Customer.GetId(), CampaignCriterionByCampaign(c.GetResourceName()))
+}
+
+func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
+	tempId := newTempIdGenerator()
+
+	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+		CustomerId: customer.GetId(),
+		MutateOperations: append([]*services.MutateOperation{
+			c.Budget.createOperation(customer, tempId),
+			c.createOperation(customer, c.Budget, tempId),
+		}, c.Criteria.createOperations(c)...),
+	})
+	return err
+}
+
+func (c *Campaign) createOperation(customer *Customer, budget *CampaignBudget, tempId tempIdGenerator) *services.MutateOperation {
+	c.ResourceName = fmt.Sprintf("customers/%s/campaigns/%s", customer.GetId(), tempId())
+	c.CampaignBudget = String(budget.GetResourceName())
+
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_CampaignOperation{
+			CampaignOperation: &services.CampaignOperation{
+				Operation: &services.CampaignOperation_Create{
+					Create: c.Campaign,
+				},
+			},
+		},
+	}
 }
 
 type Campaigns []*Campaign
