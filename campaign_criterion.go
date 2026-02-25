@@ -2,6 +2,7 @@ package googleads
 
 import (
 	"github.com/shenzhencenter/google-ads-pb/common"
+	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
 )
@@ -46,7 +47,6 @@ func (c CampaignCriteria) AddKeyword(keyword string, matchType KeywordMatchType)
 	k := &common.KeywordInfo{
 		Text: String(keyword),
 	}
-
 	matchType(k)
 
 	c.Add(&CampaignCriterion{&resources.CampaignCriterion{
@@ -60,4 +60,44 @@ func (c CampaignCriteria) createOperations(campaign *Campaign) []*services.Mutat
 	return Map(c, func(item *CampaignCriterion) *services.MutateOperation {
 		return item.createOperation(campaign)
 	})
+}
+
+func (c CampaignCriteria) AddDevice(deviceType DeviceType) {
+	d := &common.DeviceInfo{}
+	deviceType(d)
+
+	c.Add(&CampaignCriterion{&resources.CampaignCriterion{
+		Criterion: &resources.CampaignCriterion_Device{
+			Device: d,
+		},
+	}})
+}
+
+func (c CampaignCriteria) AddProximityByCoordinates(latitude, longitude float64, radius float64) {
+	c.Add(&CampaignCriterion{&resources.CampaignCriterion{
+		Criterion: &resources.CampaignCriterion_Proximity{
+			Proximity: &common.ProximityInfo{
+				GeoPoint: &common.GeoPointInfo{
+					LatitudeInMicroDegrees:  Int32(int32(latitude * 1000000)),
+					LongitudeInMicroDegrees: Int32(int32(longitude * 1000000)),
+				},
+				Radius:      Float64(radius),
+				RadiusUnits: enums.ProximityRadiusUnitsEnum_KILOMETERS,
+			},
+		},
+	}})
+}
+
+func (c CampaignCriteria) AddProximityByAddress(address string, radius float64) {
+	c.Add(&CampaignCriterion{&resources.CampaignCriterion{
+		Criterion: &resources.CampaignCriterion_Proximity{
+			Proximity: &common.ProximityInfo{
+				Address: &common.AddressInfo{
+					StreetAddress: String(address),
+				},
+				Radius:      Float64(radius),
+				RadiusUnits: enums.ProximityRadiusUnitsEnum_KILOMETERS,
+			},
+		},
+	}})
 }
