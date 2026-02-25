@@ -10,7 +10,7 @@ func FetchCampaignAsset(ctx context.Context, customerId string, filters ...Campa
 	return Fetch(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignAssetQueryBuilder().Where(filters...).Build(), createCampaignAssetInstance)
 }
 
-func ListCampaignAssets(ctx context.Context, customerId string, filters ...CampaignAssetFilter) ([]*CampaignAsset, error) {
+func ListCampaignAssets(ctx context.Context, customerId string, filters ...CampaignAssetFilter) (CampaignAssets, error) {
 	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignAssetQueryBuilder().Where(filters...).Build(), createCampaignAssetInstance)
 }
 

@@ -63,8 +63,12 @@ func (c *Campaign) SetBudget(budget int) {
 	c.Budget.SetAmountCents(budget)
 }
 
-func (c Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
+func (c *Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
 	return ListCampaignCriteria(ctx, c.Customer.GetId(), CampaignCriterionByCampaign(c.GetResourceName()))
+}
+
+func (c *Campaign) ListAssets(ctx context.Context) (CampaignAssets, error) {
+	return ListCampaignAssets(ctx, c.Customer.GetId(), CampaignAssetByCampaign(c.GetResourceName()))
 }
 
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {

@@ -13,3 +13,5 @@ func NewCampaignAsset() *CampaignAsset {
 		Asset:         NewAsset(),
 	}
 }
+
+type CampaignAssets []*CampaignAsset
