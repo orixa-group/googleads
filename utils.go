@@ -1,5 +1,7 @@
 package googleads
 
+import "strconv"
+
 func String(s string) *string {
 	return &s
 }
@@ -19,4 +21,14 @@ func Map[I, O any](slice []I, fn func(item I) O) []O {
 	}
 
 	return ss
+}
+
+type tempIdGenerator func() string
+
+func newTempIdGenerator() tempIdGenerator {
+	i := 0
+	return func() string {
+		i--
+		return strconv.Itoa(i)
+	}
 }
