@@ -14,17 +14,8 @@ func ListCampaigns(ctx context.Context, customerId string, filters ...CampaignFi
 	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder().Where(filters...).Build(), createCampaignInstance)
 }
 
-func CreateCampaign(ctx context.Context, customerId string, req *Campaign) (*Campaign, error) {
-	return Create(ctx, services.NewCampaignServiceClient(instance.conn).MutateCampaigns, &services.MutateCampaignsRequest{
-		CustomerId: customerId,
-		Operations: []*services.CampaignOperation{
-			{
-				Operation: &services.CampaignOperation_Create{Create: req.Campaign},
-			},
-		},
-	}, func(customerId string, res *services.MutateCampaignsResponse) string {
-		return res.GetResults()[0].GetResourceName()
-	}, services.NewGoogleAdsServiceClient(instance.conn), NewCampaignQueryBuilder(), CampaignByResourceName, createCampaignInstance)
+func CreateCampaign(ctx context.Context, customer *Customer, campaign *Campaign) error {
+	return campaign.Create(ctx, customer)
 }
 
 func createCampaignInstance(row *services.GoogleAdsRow) *Campaign {
