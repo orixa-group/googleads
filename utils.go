@@ -31,6 +31,15 @@ func Map[I, O any](slice []I, fn func(item I) O) []O {
 	return ss
 }
 
+func Flatten[I any](slice [][]I) []I {
+	ss := make([]I, 0)
+	for _, item := range slice {
+		ss = append(ss, item...)
+	}
+
+	return ss
+}
+
 type tempIdGenerator func() string
 
 func newTempIdGenerator() tempIdGenerator {

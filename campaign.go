@@ -81,7 +81,7 @@ func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 	ops = append(ops, c.Budget.createOperation(customer, tempId))
 	ops = append(ops, c.createOperation(customer, c.Budget, tempId))
 	ops = append(ops, c.Criteria.createOperations(c)...)
-	ops = append(ops, c.Assets.createOperations(c)...)
+	ops = append(ops, c.Assets.createOperations(customer, c, tempId)...)
 
 	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
 		CustomerId:       customer.GetId(),
