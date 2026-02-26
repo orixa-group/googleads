@@ -43,6 +43,7 @@ func (c Campaign) GetName() string {
 
 func (c *Campaign) SetName(name string) {
 	c.Campaign.Name = String(name)
+	c.Budget.Name = String(name)
 }
 
 func (c Campaign) GetEnabled() bool {

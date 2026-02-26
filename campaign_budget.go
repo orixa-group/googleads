@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
 )
@@ -14,7 +15,10 @@ type CampaignBudget struct {
 
 func NewCampaignBudget() *CampaignBudget {
 	return &CampaignBudget{
-		CampaignBudget: &resources.CampaignBudget{},
+		CampaignBudget: &resources.CampaignBudget{
+			DeliveryMethod:   enums.BudgetDeliveryMethodEnum_STANDARD,
+			ExplicitlyShared: Bool(false),
+		},
 	}
 }
 
