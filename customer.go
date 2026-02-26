@@ -2,8 +2,10 @@ package googleads
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
+	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 )
 
@@ -25,4 +27,13 @@ func (c Customer) ListCampaigns(ctx context.Context) (Campaigns, error) {
 
 func (c Customer) FetchCampaign(ctx context.Context, id string) (*Campaign, error) {
 	return FetchCampaign(ctx, c.GetId(), CampaignById(id))
+}
+
+func (c *Customer) CreateBillingSetup(ctx context.Context, paymentsAccountId string) (*BillingSetup, error) {
+	return CreateBillingSetup(ctx, c, &BillingSetup{&resources.BillingSetup{
+		PaymentsAccount: String(fmt.Sprintf("customers/%s/paymentsAccounts/%s", c.GetId(), paymentsAccountId)),
+		StartTime: &resources.BillingSetup_StartTimeType{
+			StartTimeType: enums.TimeTypeEnum_NOW,
+		},
+	}})
 }
