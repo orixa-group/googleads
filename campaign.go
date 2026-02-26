@@ -66,6 +66,52 @@ func (c *Campaign) SetBudget(budget int) {
 	c.Budget.SetAmountCents(budget)
 }
 
+func (c *Campaign) SetAdvertisingChannel(channel AdvertisingChannel) {
+	channel(c.Campaign)
+}
+
+func (c *Campaign) SetNetworkSettings(settings ...NetworkSetting) {
+	if c.NetworkSettings == nil {
+		c.NetworkSettings = &resources.Campaign_NetworkSettings{}
+	}
+	for _, s := range settings {
+		s(c.NetworkSettings)
+	}
+}
+
+func (c *Campaign) SetBiddingStrategy(strategy BiddingStrategy) {
+	strategy(c.Campaign)
+}
+
+func (c *Campaign) SetStartDate(date string) {
+	c.Campaign.StartDateTime = String(date)
+}
+
+func (c *Campaign) SetEndDate(date string) {
+	c.Campaign.EndDateTime = String(date)
+}
+
+func (c *Campaign) SetKeywordMatchType(matchType CampaignKeywordMatchType) {
+	matchType(c.Campaign)
+}
+
+func (c *Campaign) SetGeoTargetTypeSetting(settings ...GeoTargetTypeSetting) {
+	if c.GeoTargetTypeSetting == nil {
+		c.GeoTargetTypeSetting = &resources.Campaign_GeoTargetTypeSetting{}
+	}
+	for _, s := range settings {
+		s(c.GeoTargetTypeSetting)
+	}
+}
+
+func (c *Campaign) SetAdServingOptimizationStatus(status AdServingOptimizationStatus) {
+	status(c.Campaign)
+}
+
+func (c *Campaign) AddLabel(labelResourceName string) {
+	c.Campaign.Labels = append(c.Campaign.Labels, labelResourceName)
+}
+
 func (c *Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
 	return ListCampaignCriteria(ctx, c.Customer.GetId(), CampaignCriterionByCampaign(c.GetResourceName()))
 }
