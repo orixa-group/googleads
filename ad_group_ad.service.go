@@ -15,8 +15,5 @@ func ListAdGroupAds(ctx context.Context, customerId string, filters ...AdGroupAd
 }
 
 func createAdGroupAdInstance(row *services.GoogleAdsRow) *AdGroupAd {
-	return &AdGroupAd{
-		AdGroupAd: row.GetAdGroupAd(),
-		Ad:        &Ad{row.GetAdGroupAd().GetAd()},
-	}
+	return &AdGroupAd{row.GetAdGroupAd()}
 }

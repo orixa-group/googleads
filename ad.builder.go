@@ -1,11 +1,11 @@
 package googleads
 
 type AdQueryBuilder struct {
-	*QueryBuilder[AdFilter]
+	*QueryBuilder[Filter]
 }
 
 func NewAdQueryBuilder() *AdQueryBuilder {
-	return &AdQueryBuilder{NewQueryBuilder[AdFilter]().
+	return &AdQueryBuilder{NewQueryBuilder[Filter]().
 		Select(
 			"ad.video_responsive_ad.videos",
 			"ad.video_responsive_ad.long_headlines",
@@ -171,9 +171,4 @@ func NewAdQueryBuilder() *AdQueryBuilder {
 			"ad.added_by_google_ads",
 		).
 		From("ad")}
-}
-
-func (b *AdQueryBuilder) Where(clauses ...AdFilter) *AdQueryBuilder {
-	b.QueryBuilder.Where(clauses...)
-	return b
 }
