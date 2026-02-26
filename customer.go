@@ -37,3 +37,20 @@ func (c *Customer) CreateBillingSetup(ctx context.Context, paymentsAccountId str
 		},
 	}})
 }
+
+func (c *Customer) CreateAccountBudget(ctx context.Context, bs *BillingSetup) (*AccountBudget, error) {
+	return CreateAccountBudget(ctx, c, &AccountBudget{&resources.AccountBudgetProposal{
+		BillingSetup: String(bs.GetResourceName()),
+		ProposalType: enums.AccountBudgetProposalTypeEnum_CREATE,
+		ProposedName: String(c.GetDescriptiveName()),
+		ProposedStartTime: &resources.AccountBudgetProposal_ProposedStartTimeType{
+			ProposedStartTimeType: enums.TimeTypeEnum_NOW,
+		},
+		ProposedEndTime: &resources.AccountBudgetProposal_ProposedEndTimeType{
+			ProposedEndTimeType: enums.TimeTypeEnum_FOREVER,
+		},
+		ProposedSpendingLimit: &resources.AccountBudgetProposal_ProposedSpendingLimitType{
+			ProposedSpendingLimitType: enums.SpendingLimitTypeEnum_INFINITE,
+		},
+	}})
+}

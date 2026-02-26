@@ -1,0 +1,38 @@
+package googleads
+
+type AccountBudgetQueryBuilder struct {
+	*QueryBuilder[AccountBudgetFilter]
+}
+
+func NewAccountBudgetQueryBuilder() *AccountBudgetQueryBuilder {
+	return &AccountBudgetQueryBuilder{NewQueryBuilder[AccountBudgetFilter]().
+		Select(
+			"account_budget_proposal.status",
+			"account_budget_proposal.resource_name",
+			"account_budget_proposal.proposed_start_date_time",
+			"account_budget_proposal.proposed_spending_limit_type",
+			"account_budget_proposal.proposed_spending_limit_micros",
+			"account_budget_proposal.proposed_purchase_order_number",
+			"account_budget_proposal.proposed_notes",
+			"account_budget_proposal.proposed_name",
+			"account_budget_proposal.proposed_end_time_type",
+			"account_budget_proposal.proposed_end_date_time",
+			"account_budget_proposal.proposal_type",
+			"account_budget_proposal.id",
+			"account_budget_proposal.creation_date_time",
+			"account_budget_proposal.billing_setup",
+			"account_budget_proposal.approved_start_date_time",
+			"account_budget_proposal.approved_spending_limit_type",
+			"account_budget_proposal.approved_spending_limit_micros",
+			"account_budget_proposal.approved_end_time_type",
+			"account_budget_proposal.approved_end_date_time",
+			"account_budget_proposal.approval_date_time",
+			"account_budget_proposal.account_budget",
+		).
+		From("account_budget_proposal")}
+}
+
+func (b *AccountBudgetQueryBuilder) Where(clauses ...AccountBudgetFilter) *AccountBudgetQueryBuilder {
+	b.QueryBuilder.Where(clauses...)
+	return b
+}
