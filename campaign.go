@@ -85,6 +85,16 @@ func (c *Campaign) AddAssetGroup() *AssetGroup {
 	}
 }
 
+func (c *Campaign) AddAdGroup() *AdGroup {
+	return &AdGroup{
+		AdGroup:  &resources.AdGroup{},
+		Campaign: c,
+		Criteria: NewAdGroupCriteria(),
+		Assets:   NewAdGroupAssets(),
+		Ads:      NewAdGroupAds(),
+	}
+}
+
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 	tempId := newTempIdGenerator()
 

@@ -1,6 +1,7 @@
 package googleads
 
 import (
+	"github.com/shenzhencenter/google-ads-pb/common"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
 )
@@ -31,6 +32,25 @@ type AdGroupCriteria []*AdGroupCriterion
 
 func NewAdGroupCriteria() AdGroupCriteria {
 	return make(AdGroupCriteria, 0)
+}
+
+func (agcs AdGroupCriteria) Add(criterion *AdGroupCriterion) {
+	agcs = append(agcs, &AdGroupCriterion{&resources.AdGroupCriterion{
+		Criterion: criterion.GetCriterion(),
+	}})
+}
+
+func (agcs AdGroupCriteria) AddKeyword(keyword string, matchType KeywordMatchType) {
+	k := &common.KeywordInfo{
+		Text: String(keyword),
+	}
+	matchType(k)
+
+	agcs.Add(&AdGroupCriterion{&resources.AdGroupCriterion{
+		Criterion: &resources.AdGroupCriterion_Keyword{
+			Keyword: k,
+		},
+	}})
 }
 
 func (agcs AdGroupCriteria) createOperations(adGroup *AdGroup) []*services.MutateOperation {
