@@ -79,6 +79,14 @@ func (c *Campaign) SetNetworkSettings(settings ...NetworkSetting) {
 	}
 }
 
+func (c *Campaign) SetContainsEuPoliticalAdvertising(containsEuPoliticalAdvertising bool) {
+	if containsEuPoliticalAdvertising {
+		c.Campaign.ContainsEuPoliticalAdvertising = enums.EuPoliticalAdvertisingStatusEnum_CONTAINS_EU_POLITICAL_ADVERTISING
+	} else {
+		c.Campaign.ContainsEuPoliticalAdvertising = enums.EuPoliticalAdvertisingStatusEnum_DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING
+	}
+}
+
 func (c *Campaign) SetBiddingStrategy(strategy BiddingStrategy) {
 	strategy(c.Campaign)
 }
@@ -102,6 +110,10 @@ func (c *Campaign) SetGeoTargetTypeSetting(settings ...GeoTargetTypeSetting) {
 	for _, s := range settings {
 		s(c.GeoTargetTypeSetting)
 	}
+}
+
+func (c *Campaign) SetBrandGuidelinesEnabled(enabled bool) {
+	c.BrandGuidelinesEnabled = Bool(enabled)
 }
 
 func (c *Campaign) SetAdServingOptimizationStatus(status AdServingOptimizationStatus) {
@@ -152,11 +164,25 @@ func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 	ops = append(ops, c.Criteria.createOperations(c)...)
 	ops = append(ops, c.Assets.createOperations(customer, c, tempId)...)
 
-	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+	resp, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
 		CustomerId:       customer.GetId(),
 		MutateOperations: ops,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	campaign, err := FetchCampaign(ctx, customer.GetId(), CampaignByResourceName(resp.GetMutateOperationResponses()[1].GetCampaignResult().GetResourceName()))
+	if err != nil {
+		return err
+	}
+
+	c.Campaign = campaign.Campaign
+	c.Budget = campaign.Budget
+	c.Criteria = campaign.Criteria
+	c.Assets = campaign.Assets
+
+	return nil
 }
 
 func (c *Campaign) createOperation(customer *Customer, budget *CampaignBudget, tempId tempIdGenerator) *services.MutateOperation {
