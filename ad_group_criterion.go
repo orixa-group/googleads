@@ -11,3 +11,9 @@ type AdGroupCriterion struct {
 func NewAdGroupCriterion() *AdGroupCriterion {
 	return &AdGroupCriterion{&resources.AdGroupCriterion{}}
 }
+
+type AdGroupCriteria []*AdGroupCriterion
+
+func NewAdGroupCriteria() AdGroupCriteria {
+	return make(AdGroupCriteria, 0)
+}

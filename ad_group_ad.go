@@ -13,3 +13,9 @@ func NewAdGroupAd() *AdGroupAd {
 		Ad:        NewAd(),
 	}
 }
+
+type AdGroupAds []*AdGroupAd
+
+func NewAdGroupAds() AdGroupAds {
+	return make(AdGroupAds, 0)
+}

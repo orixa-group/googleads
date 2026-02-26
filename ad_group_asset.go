@@ -13,3 +13,9 @@ func NewAdGroupAsset() *AdGroupAsset {
 		Asset:        NewAsset(),
 	}
 }
+
+type AdGroupAssets []*AdGroupAsset
+
+func NewAdGroupAssets() AdGroupAssets {
+	return make(AdGroupAssets, 0)
+}
