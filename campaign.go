@@ -77,6 +77,14 @@ func (c *Campaign) ListAssetGroups(ctx context.Context) (AssetGroups, error) {
 	return ListAssetGroups(ctx, c.Customer.GetId(), AssetGroupByCampaign(c.GetResourceName()))
 }
 
+func (c *Campaign) AddAssetGroup() *AssetGroup {
+	return &AssetGroup{
+		AssetGroup: &resources.AssetGroup{},
+		Campaign:   c,
+		Assets:     NewAssetGroupAssets(),
+	}
+}
+
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 	tempId := newTempIdGenerator()
 
