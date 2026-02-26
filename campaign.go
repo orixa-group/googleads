@@ -13,8 +13,8 @@ import (
 type Campaign struct {
 	*resources.Campaign
 	Budget   *CampaignBudget
-	Criteria CampaignCriteria
 	Customer *Customer
+	Criteria CampaignCriteria
 	Assets   CampaignAssets
 }
 
@@ -22,8 +22,8 @@ func NewCampaign() *Campaign {
 	return &Campaign{
 		Campaign: &resources.Campaign{},
 		Budget:   NewCampaignBudget(),
-		Criteria: NewCampaignCriteria(),
 		Customer: NewCustomer(),
+		Criteria: NewCampaignCriteria(),
 		Assets:   NewCampaignAssets(),
 	}
 }
@@ -71,6 +71,10 @@ func (c *Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
 
 func (c *Campaign) ListAssets(ctx context.Context) (CampaignAssets, error) {
 	return ListCampaignAssets(ctx, c.Customer.GetId(), CampaignAssetByCampaign(c.GetResourceName()))
+}
+
+func (c *Campaign) ListAssetGroups(ctx context.Context) (AssetGroups, error) {
+	return ListAssetGroups(ctx, c.Customer.GetId(), AssetGroupByCampaign(c.GetResourceName()))
 }
 
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
