@@ -172,15 +172,8 @@ func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 		return err
 	}
 
-	campaign, err := FetchCampaign(ctx, customer.GetId(), CampaignByResourceName(resp.GetMutateOperationResponses()[1].GetCampaignResult().GetResourceName()))
-	if err != nil {
-		return err
-	}
-
-	c.Campaign = campaign.Campaign
-	c.Budget = campaign.Budget
-	c.Criteria = campaign.Criteria
-	c.Assets = campaign.Assets
+	c.ResourceName = resp.GetMutateOperationResponses()[1].GetCampaignResult().GetResourceName()
+	c.Id = Int64(resp.GetMutateOperationResponses()[1].GetCampaignResult().GetCampaign().GetId())
 
 	return nil
 }
