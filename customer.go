@@ -26,10 +26,6 @@ func NewCustomer() *Customer {
 	}
 }
 
-func (c *Customer) SetResourceName(resourceName string) {
-	c.Customer.ResourceName = resourceName
-}
-
 func (c Customer) GetId() string {
 	return strconv.Itoa(int(c.Customer.GetId()))
 }
@@ -84,22 +80,24 @@ func (c *Customer) Create(ctx context.Context, parent *Customer) error {
 	}
 
 	c.SetId(strings.Split(resp.GetResourceName(), "/")[1])
-	c.SetResourceName(resp.GetResourceName())
+	c.ResourceName = resp.GetResourceName()
 
 	return nil
 }
 
 func (c *Customer) CreateBillingSetup(ctx context.Context, paymentsAccountId string) (*BillingSetup, error) {
+	bs := &BillingSetup{&resources.BillingSetup{
+		PaymentsAccount: String(fmt.Sprintf("customers/%s/paymentsAccounts/%s", c.GetId(), paymentsAccountId)),
+		StartTime: &resources.BillingSetup_StartTimeType{
+			StartTimeType: enums.TimeTypeEnum_NOW,
+		},
+	}}
+
 	resp, err := services.NewBillingSetupServiceClient(instance.conn).MutateBillingSetup(ctx, &services.MutateBillingSetupRequest{
 		CustomerId: c.GetId(),
 		Operation: &services.BillingSetupOperation{
 			Operation: &services.BillingSetupOperation_Create{
-				Create: &resources.BillingSetup{
-					PaymentsAccount: String(fmt.Sprintf("customers/%s/paymentsAccounts/%s", c.GetId(), paymentsAccountId)),
-					StartTime: &resources.BillingSetup_StartTimeType{
-						StartTimeType: enums.TimeTypeEnum_NOW,
-					},
-				},
+				Create: bs.BillingSetup,
 			},
 		},
 	})
@@ -107,30 +105,33 @@ func (c *Customer) CreateBillingSetup(ctx context.Context, paymentsAccountId str
 		return nil, err
 	}
 
-	return &BillingSetup{&resources.BillingSetup{
-		ResourceName: resp.GetResult().GetResourceName(),
-	}}, nil
+	bs.SetId(strings.Split(resp.GetResult().GetResourceName(), "/")[3])
+	bs.ResourceName = resp.GetResult().GetResourceName()
+
+	return bs, nil
 }
 
 func (c *Customer) CreateAccountBudget(ctx context.Context, bs *BillingSetup) (*AccountBudget, error) {
+	ab := &AccountBudget{&resources.AccountBudgetProposal{
+		BillingSetup: String(bs.GetResourceName()),
+		ProposalType: enums.AccountBudgetProposalTypeEnum_CREATE,
+		ProposedName: String(c.GetDescriptiveName()),
+		ProposedStartTime: &resources.AccountBudgetProposal_ProposedStartTimeType{
+			ProposedStartTimeType: enums.TimeTypeEnum_NOW,
+		},
+		ProposedEndTime: &resources.AccountBudgetProposal_ProposedEndTimeType{
+			ProposedEndTimeType: enums.TimeTypeEnum_FOREVER,
+		},
+		ProposedSpendingLimit: &resources.AccountBudgetProposal_ProposedSpendingLimitType{
+			ProposedSpendingLimitType: enums.SpendingLimitTypeEnum_INFINITE,
+		},
+	}}
+
 	resp, err := services.NewAccountBudgetProposalServiceClient(instance.conn).MutateAccountBudgetProposal(ctx, &services.MutateAccountBudgetProposalRequest{
 		CustomerId: c.GetId(),
 		Operation: &services.AccountBudgetProposalOperation{
 			Operation: &services.AccountBudgetProposalOperation_Create{
-				Create: &resources.AccountBudgetProposal{
-					BillingSetup: String(bs.GetResourceName()),
-					ProposalType: enums.AccountBudgetProposalTypeEnum_CREATE,
-					ProposedName: String(c.GetDescriptiveName()),
-					ProposedStartTime: &resources.AccountBudgetProposal_ProposedStartTimeType{
-						ProposedStartTimeType: enums.TimeTypeEnum_NOW,
-					},
-					ProposedEndTime: &resources.AccountBudgetProposal_ProposedEndTimeType{
-						ProposedEndTimeType: enums.TimeTypeEnum_FOREVER,
-					},
-					ProposedSpendingLimit: &resources.AccountBudgetProposal_ProposedSpendingLimitType{
-						ProposedSpendingLimitType: enums.SpendingLimitTypeEnum_INFINITE,
-					},
-				},
+				Create: ab.AccountBudgetProposal,
 			},
 		},
 	})
@@ -138,7 +139,8 @@ func (c *Customer) CreateAccountBudget(ctx context.Context, bs *BillingSetup) (*
 		return nil, err
 	}
 
-	return &AccountBudget{&resources.AccountBudgetProposal{
-		ResourceName: resp.GetResult().GetResourceName(),
-	}}, nil
+	ab.SetId(strings.Split(resp.GetResult().GetResourceName(), "/")[3])
+	ab.ResourceName = resp.GetResult().GetResourceName()
+
+	return ab, nil
 }
