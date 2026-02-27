@@ -13,13 +13,17 @@ import (
 
 type Customer struct {
 	*resources.Customer
+	Assets CustomerAssets
 }
 
 func NewCustomer() *Customer {
-	return &Customer{&resources.Customer{
-		CurrencyCode: String("EUR"),
-		TimeZone:     String("Europe/Paris"),
-	}}
+	return &Customer{
+		Customer: &resources.Customer{
+			CurrencyCode: String("EUR"),
+			TimeZone:     String("Europe/Paris"),
+		},
+		Assets: NewCustomerAssets(),
+	}
 }
 
 func (c *Customer) SetResourceName(resourceName string) {
@@ -49,6 +53,10 @@ func (c Customer) ListCampaigns(ctx context.Context) (Campaigns, error) {
 
 func (c Customer) FetchCampaign(ctx context.Context, id string) (*Campaign, error) {
 	return FetchCampaign(ctx, c.GetId(), CampaignById(id))
+}
+
+func (c Customer) ListAssets(ctx context.Context) (CustomerAssets, error) {
+	return ListCustomerAssets(ctx, c.GetId(), CustomerAssetByCustomer(c.GetResourceName()))
 }
 
 func (c *Customer) Create(ctx context.Context, parent *Customer) error {
