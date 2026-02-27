@@ -14,17 +14,8 @@ func ListAccountBudgets(ctx context.Context, customer *Customer, filters ...Acco
 	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customer.GetId(), NewAccountBudgetQueryBuilder().Where(filters...).Build(), createAccountBudgetInstance)
 }
 
-func CreateAccountBudget(ctx context.Context, customer *Customer, ab *AccountBudget) (*AccountBudget, error) {
-	return Create(ctx, services.NewAccountBudgetProposalServiceClient(instance.conn).MutateAccountBudgetProposal, &services.MutateAccountBudgetProposalRequest{
-		CustomerId: customer.GetId(),
-		Operation: &services.AccountBudgetProposalOperation{
-			Operation: &services.AccountBudgetProposalOperation_Create{
-				Create: ab.AccountBudgetProposal,
-			},
-		},
-	}, func(customerId string, res *services.MutateAccountBudgetProposalResponse) string {
-		return res.GetResult().GetResourceName()
-	}, services.NewGoogleAdsServiceClient(instance.conn), NewAccountBudgetQueryBuilder(), AccountBudgetByResourceName, createAccountBudgetInstance)
+func CreateAccountBudget(ctx context.Context, customer *Customer, bs *BillingSetup) (*AccountBudget, error) {
+	return customer.CreateAccountBudget(ctx, bs)
 }
 
 func createAccountBudgetInstance(row *services.GoogleAdsRow) *AccountBudget {

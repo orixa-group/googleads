@@ -14,17 +14,8 @@ func ListBillingSetups(ctx context.Context, customer *Customer, filters ...Billi
 	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customer.GetId(), NewBillingSetupQueryBuilder().Where(filters...).Build(), createBillingSetupInstance)
 }
 
-func CreateBillingSetup(ctx context.Context, customer *Customer, bs *BillingSetup) (*BillingSetup, error) {
-	return Create(ctx, services.NewBillingSetupServiceClient(instance.conn).MutateBillingSetup, &services.MutateBillingSetupRequest{
-		CustomerId: customer.GetId(),
-		Operation: &services.BillingSetupOperation{
-			Operation: &services.BillingSetupOperation_Create{
-				Create: bs.BillingSetup,
-			},
-		},
-	}, func(customerId string, res *services.MutateBillingSetupResponse) string {
-		return res.GetResult().GetResourceName()
-	}, services.NewGoogleAdsServiceClient(instance.conn), NewBillingSetupQueryBuilder(), BillingSetupByResourceName, createBillingSetupInstance)
+func CreateBillingSetup(ctx context.Context, customer *Customer, paymentsAccountId string) (*BillingSetup, error) {
+	return customer.CreateBillingSetup(ctx, paymentsAccountId)
 }
 
 func createBillingSetupInstance(row *services.GoogleAdsRow) *BillingSetup {

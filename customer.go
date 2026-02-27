@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
+	"github.com/shenzhencenter/google-ads-pb/services"
 )
 
 type Customer struct {
@@ -18,6 +20,10 @@ func NewCustomer() *Customer {
 		CurrencyCode: String("EUR"),
 		TimeZone:     String("Europe/Paris"),
 	}}
+}
+
+func (c *Customer) SetResourceName(resourceName string) {
+	c.Customer.ResourceName = resourceName
 }
 
 func (c Customer) GetId() string {
@@ -46,37 +52,70 @@ func (c Customer) FetchCampaign(ctx context.Context, id string) (*Campaign, erro
 }
 
 func (c *Customer) Create(ctx context.Context, parent *Customer) error {
-	customer, err := CreateCustomer(ctx, c, parent)
+	resp, err := services.NewCustomerServiceClient(instance.conn).CreateCustomerClient(ctx, &services.CreateCustomerClientRequest{
+		CustomerId:     parent.GetId(),
+		CustomerClient: c.Customer,
+	})
 	if err != nil {
 		return err
 	}
 
-	c.Customer = customer.Customer
+	c.SetId(strings.Split(resp.GetResourceName(), "/")[1])
+	c.SetResourceName(resp.GetResourceName())
+
 	return nil
 }
 
 func (c *Customer) CreateBillingSetup(ctx context.Context, paymentsAccountId string) (*BillingSetup, error) {
-	return CreateBillingSetup(ctx, c, &BillingSetup{&resources.BillingSetup{
-		PaymentsAccount: String(fmt.Sprintf("customers/%s/paymentsAccounts/%s", c.GetId(), paymentsAccountId)),
-		StartTime: &resources.BillingSetup_StartTimeType{
-			StartTimeType: enums.TimeTypeEnum_NOW,
+	resp, err := services.NewBillingSetupServiceClient(instance.conn).MutateBillingSetup(ctx, &services.MutateBillingSetupRequest{
+		CustomerId: c.GetId(),
+		Operation: &services.BillingSetupOperation{
+			Operation: &services.BillingSetupOperation_Create{
+				Create: &resources.BillingSetup{
+					PaymentsAccount: String(fmt.Sprintf("customers/%s/paymentsAccounts/%s", c.GetId(), paymentsAccountId)),
+					StartTime: &resources.BillingSetup_StartTimeType{
+						StartTimeType: enums.TimeTypeEnum_NOW,
+					},
+				},
+			},
 		},
-	}})
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &BillingSetup{&resources.BillingSetup{
+		ResourceName: resp.GetResult().GetResourceName(),
+	}}, nil
 }
 
 func (c *Customer) CreateAccountBudget(ctx context.Context, bs *BillingSetup) (*AccountBudget, error) {
-	return CreateAccountBudget(ctx, c, &AccountBudget{&resources.AccountBudgetProposal{
-		BillingSetup: String(bs.GetResourceName()),
-		ProposalType: enums.AccountBudgetProposalTypeEnum_CREATE,
-		ProposedName: String(c.GetDescriptiveName()),
-		ProposedStartTime: &resources.AccountBudgetProposal_ProposedStartTimeType{
-			ProposedStartTimeType: enums.TimeTypeEnum_NOW,
+	resp, err := services.NewAccountBudgetProposalServiceClient(instance.conn).MutateAccountBudgetProposal(ctx, &services.MutateAccountBudgetProposalRequest{
+		CustomerId: c.GetId(),
+		Operation: &services.AccountBudgetProposalOperation{
+			Operation: &services.AccountBudgetProposalOperation_Create{
+				Create: &resources.AccountBudgetProposal{
+					BillingSetup: String(bs.GetResourceName()),
+					ProposalType: enums.AccountBudgetProposalTypeEnum_CREATE,
+					ProposedName: String(c.GetDescriptiveName()),
+					ProposedStartTime: &resources.AccountBudgetProposal_ProposedStartTimeType{
+						ProposedStartTimeType: enums.TimeTypeEnum_NOW,
+					},
+					ProposedEndTime: &resources.AccountBudgetProposal_ProposedEndTimeType{
+						ProposedEndTimeType: enums.TimeTypeEnum_FOREVER,
+					},
+					ProposedSpendingLimit: &resources.AccountBudgetProposal_ProposedSpendingLimitType{
+						ProposedSpendingLimitType: enums.SpendingLimitTypeEnum_INFINITE,
+					},
+				},
+			},
 		},
-		ProposedEndTime: &resources.AccountBudgetProposal_ProposedEndTimeType{
-			ProposedEndTimeType: enums.TimeTypeEnum_FOREVER,
-		},
-		ProposedSpendingLimit: &resources.AccountBudgetProposal_ProposedSpendingLimitType{
-			ProposedSpendingLimitType: enums.SpendingLimitTypeEnum_INFINITE,
-		},
-	}})
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &AccountBudget{&resources.AccountBudgetProposal{
+		ResourceName: resp.GetResult().GetResourceName(),
+	}}, nil
 }
