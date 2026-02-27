@@ -35,6 +35,62 @@ func (c *Customer) SetId(id string) {
 	c.Customer.Id = Int64(i)
 }
 
+func (c Customer) GetCurrency() string {
+	return c.Customer.GetCurrencyCode()
+}
+
+func (c *Customer) SetCurrency(code string) {
+	c.Customer.CurrencyCode = String(code)
+}
+
+func (c Customer) GetTimeZone() string {
+	return c.Customer.GetTimeZone()
+}
+
+func (c *Customer) SetTimeZone(tz string) {
+	c.Customer.TimeZone = String(tz)
+}
+
+func (c Customer) IsAutoTaggingEnabled() bool {
+	return c.Customer.GetAutoTaggingEnabled()
+}
+
+func (c *Customer) SetAutoTagging(enabled bool) {
+	c.Customer.AutoTaggingEnabled = Bool(enabled)
+}
+
+func (c Customer) IsTestAccount() bool {
+	return c.Customer.GetTestAccount()
+}
+
+func (c *Customer) SetTestAccount(test bool) {
+	c.Customer.TestAccount = Bool(test)
+}
+
+func (c Customer) GetTrackingUrl() string {
+	return c.Customer.GetTrackingUrlTemplate()
+}
+
+func (c *Customer) SetTrackingUrl(url string) {
+	c.Customer.TrackingUrlTemplate = String(url)
+}
+
+func (c Customer) GetFinalUrlSuffix() string {
+	return c.Customer.GetFinalUrlSuffix()
+}
+
+func (c *Customer) SetFinalUrlSuffix(suffix string) {
+	c.Customer.FinalUrlSuffix = String(suffix)
+}
+
+func (c Customer) IsManager() bool {
+	return c.Customer.GetManager()
+}
+
+func (c *Customer) SetIsManager(manager bool) {
+	c.Customer.Manager = Bool(manager)
+}
+
 func (c Customer) GetName() string {
 	return c.Customer.GetDescriptiveName()
 }
