@@ -22,7 +22,7 @@ func NewCampaign() *Campaign {
 	return &Campaign{
 		Campaign: &resources.Campaign{},
 		Budget:   NewCampaignBudget(),
-		Customer: NewCustomer(),
+		Customer: &Customer{},
 		Criteria: NewCampaignCriteria(),
 		Assets:   NewCampaignAssets(),
 	}

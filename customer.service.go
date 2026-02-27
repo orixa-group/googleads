@@ -13,7 +13,7 @@ func FetchCustomer(ctx context.Context, id string) (*Customer, error) {
 	}).Build(), func(row *services.GoogleAdsRow) *Customer {
 		return &Customer{
 			Customer: row.GetCustomer(),
-			Assets:   NewCustomerAssets(),
+			Assets:   make(CustomerAssets, 0),
 		}
 	})
 }

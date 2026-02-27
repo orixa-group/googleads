@@ -16,13 +16,14 @@ type Customer struct {
 	Assets CustomerAssets
 }
 
-func NewCustomer() *Customer {
+func NewCustomer(name string) *Customer {
 	return &Customer{
 		Customer: &resources.Customer{
-			CurrencyCode: String("EUR"),
-			TimeZone:     String("Europe/Paris"),
+			CurrencyCode:    String("EUR"),
+			TimeZone:        String("Europe/Paris"),
+			DescriptiveName: String(name),
 		},
-		Assets: NewCustomerAssets(),
+		Assets: make(CustomerAssets, 0),
 	}
 }
 
@@ -41,10 +42,6 @@ func (c Customer) GetCurrency() string {
 
 func (c *Customer) SetCurrency(code string) {
 	c.Customer.CurrencyCode = String(code)
-}
-
-func (c Customer) GetTimeZone() string {
-	return c.Customer.GetTimeZone()
 }
 
 func (c *Customer) SetTimeZone(tz string) {
@@ -73,10 +70,6 @@ func (c Customer) GetTrackingUrl() string {
 
 func (c *Customer) SetTrackingUrl(url string) {
 	c.Customer.TrackingUrlTemplate = String(url)
-}
-
-func (c Customer) GetFinalUrlSuffix() string {
-	return c.Customer.GetFinalUrlSuffix()
 }
 
 func (c *Customer) SetFinalUrlSuffix(suffix string) {
