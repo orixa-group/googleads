@@ -37,13 +37,13 @@ func NewCampaignCriteria() CampaignCriteria {
 	return make(CampaignCriteria, 0)
 }
 
-func (c CampaignCriteria) Add(criterion *CampaignCriterion) {
-	c = append(c, &CampaignCriterion{&resources.CampaignCriterion{
+func (c *CampaignCriteria) Add(criterion *CampaignCriterion) {
+	*c = append(*c, &CampaignCriterion{&resources.CampaignCriterion{
 		Criterion: criterion.GetCriterion(),
 	}})
 }
 
-func (c CampaignCriteria) AddKeyword(keyword string, matchType KeywordMatchType) {
+func (c *CampaignCriteria) AddKeyword(keyword string, matchType KeywordMatchType) {
 	k := &common.KeywordInfo{
 		Text: String(keyword),
 	}
@@ -62,7 +62,7 @@ func (c CampaignCriteria) createOperations(campaign *Campaign) []*services.Mutat
 	})
 }
 
-func (c CampaignCriteria) AddDevice(deviceType DeviceType) {
+func (c *CampaignCriteria) AddDevice(deviceType DeviceType) {
 	d := &common.DeviceInfo{}
 	deviceType(d)
 
@@ -73,7 +73,7 @@ func (c CampaignCriteria) AddDevice(deviceType DeviceType) {
 	}})
 }
 
-func (c CampaignCriteria) AddProximityByCoordinates(latitude, longitude float64, radius float64) {
+func (c *CampaignCriteria) AddProximityByCoordinates(latitude, longitude float64, radius float64) {
 	c.Add(&CampaignCriterion{&resources.CampaignCriterion{
 		Criterion: &resources.CampaignCriterion_Proximity{
 			Proximity: &common.ProximityInfo{
@@ -88,7 +88,7 @@ func (c CampaignCriteria) AddProximityByCoordinates(latitude, longitude float64,
 	}})
 }
 
-func (c CampaignCriteria) AddProximityByAddress(address string, radius float64) {
+func (c *CampaignCriteria) AddProximityByAddress(address string, radius float64) {
 	c.Add(&CampaignCriterion{&resources.CampaignCriterion{
 		Criterion: &resources.CampaignCriterion_Proximity{
 			Proximity: &common.ProximityInfo{
