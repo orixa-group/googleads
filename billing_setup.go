@@ -10,10 +10,6 @@ type BillingSetup struct {
 	*resources.BillingSetup
 }
 
-func NewBillingSetup() *BillingSetup {
-	return &BillingSetup{&resources.BillingSetup{}}
-}
-
 func (bs *BillingSetup) GetId() string {
 	return strconv.Itoa(int(bs.BillingSetup.GetId()))
 }

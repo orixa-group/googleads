@@ -10,10 +10,6 @@ type AccountBudget struct {
 	*resources.AccountBudgetProposal
 }
 
-func NewAccountBudget() *AccountBudget {
-	return &AccountBudget{&resources.AccountBudgetProposal{}}
-}
-
 func (ab *AccountBudget) GetId() string {
 	return strconv.Itoa(int(ab.AccountBudgetProposal.GetId()))
 }
