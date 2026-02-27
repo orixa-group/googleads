@@ -2,7 +2,10 @@ package googleads
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 
+	"github.com/shenzhencenter/google-ads-pb/common"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
 )
@@ -26,5 +29,32 @@ func (a *Asset) createOperation(customer *Customer, tempId tempIdGenerator) *ser
 				},
 			},
 		},
+	}
+}
+
+type AssetImageSource func(asset *common.ImageAsset) error
+
+func AssetImageFromBytes(data []byte) AssetImageSource {
+	return func(asset *common.ImageAsset) error {
+		asset.Data = data
+		return nil
+	}
+}
+
+func AssetImageFromUrl(url string) AssetImageSource {
+	return func(asset *common.ImageAsset) error {
+		resp, err := http.Get(url)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		data, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		asset.Data = data
+		return nil
 	}
 }

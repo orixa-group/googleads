@@ -53,19 +53,18 @@ func (c *CustomerAssets) Add(asset *CustomerAsset) {
 	}}})
 }
 
-func (c *CustomerAssets) AddSitelink(text, description1, description2 string, finalUrls ...string) {
+func (c *CustomerAssets) AddSitelink(text, finalUrl string, description string) {
 	c.Add(&CustomerAsset{
 		CustomerAsset: &resources.CustomerAsset{
 			FieldType: enums.AssetFieldTypeEnum_SITELINK,
 		},
 		Asset: &Asset{
 			Asset: &resources.Asset{
-				FinalUrls: finalUrls,
+				FinalUrls: []string{finalUrl},
 				AssetData: &resources.Asset_SitelinkAsset{
 					SitelinkAsset: &common.SitelinkAsset{
 						LinkText:     text,
-						Description1: description1,
-						Description2: description2,
+						Description1: description,
 					},
 				},
 			},
@@ -90,24 +89,6 @@ func (c *CustomerAssets) AddCallout(text string) {
 	})
 }
 
-func (c *CustomerAssets) AddCall(countryCode, phoneNumber string) {
-	c.Add(&CustomerAsset{
-		CustomerAsset: &resources.CustomerAsset{
-			FieldType: enums.AssetFieldTypeEnum_CALL,
-		},
-		Asset: &Asset{
-			Asset: &resources.Asset{
-				AssetData: &resources.Asset_CallAsset{
-					CallAsset: &common.CallAsset{
-						CountryCode: countryCode,
-						PhoneNumber: phoneNumber,
-					},
-				},
-			},
-		},
-	})
-}
-
 func (c *CustomerAssets) AddStructuredSnippet(header string, values ...string) {
 	c.Add(&CustomerAsset{
 		CustomerAsset: &resources.CustomerAsset{
@@ -124,6 +105,53 @@ func (c *CustomerAssets) AddStructuredSnippet(header string, values ...string) {
 			},
 		},
 	})
+}
+
+func (c *CustomerAssets) AddBusinessName(name string) {
+	c.Add(&CustomerAsset{
+		CustomerAsset: &resources.CustomerAsset{
+			FieldType: enums.AssetFieldTypeEnum_BUSINESS_NAME,
+		},
+		Asset: &Asset{
+			Asset: &resources.Asset{
+				AssetData: &resources.Asset_TextAsset{
+					TextAsset: &common.TextAsset{
+						Text: String(name),
+					},
+				},
+			},
+		},
+	})
+}
+
+func (c *CustomerAssets) AddBusinessLogo(source AssetImageSource) error {
+	return c.addImageAsset(source, enums.AssetFieldTypeEnum_BUSINESS_LOGO)
+}
+
+func (c *CustomerAssets) AddImage(source AssetImageSource) error {
+	return c.addImageAsset(source, enums.AssetFieldTypeEnum_AD_IMAGE)
+}
+
+func (c *CustomerAssets) addImageAsset(source AssetImageSource, fieldType enums.AssetFieldTypeEnum_AssetFieldType) error {
+	ia := &common.ImageAsset{}
+	if err := source(ia); err != nil {
+		return err
+	}
+
+	c.Add(&CustomerAsset{
+		CustomerAsset: &resources.CustomerAsset{
+			FieldType: fieldType,
+		},
+		Asset: &Asset{
+			Asset: &resources.Asset{
+				AssetData: &resources.Asset_ImageAsset{
+					ImageAsset: ia,
+				},
+			},
+		},
+	})
+
+	return nil
 }
 
 func (c CustomerAssets) createOperations(customer *Customer, tempId tempIdGenerator) []*services.MutateOperation {
