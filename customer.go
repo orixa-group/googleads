@@ -59,6 +59,21 @@ func (c Customer) ListAssets(ctx context.Context) (CustomerAssets, error) {
 	return ListCustomerAssets(ctx, c.GetId(), CustomerAssetByCustomer(c.GetResourceName()))
 }
 
+func (c *Customer) CreateAssets(ctx context.Context) error {
+	tempId := newTempIdGenerator()
+
+	ops := c.Assets.createOperations(c, tempId)
+	if len(ops) == 0 {
+		return nil
+	}
+
+	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+		CustomerId:       c.GetId(),
+		MutateOperations: ops,
+	})
+	return err
+}
+
 func (c *Customer) Create(ctx context.Context, parent *Customer) error {
 	resp, err := services.NewCustomerServiceClient(instance.conn).CreateCustomerClient(ctx, &services.CreateCustomerClientRequest{
 		CustomerId:     parent.GetId(),
