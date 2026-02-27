@@ -60,3 +60,11 @@ func BiddingTargetRoas(targetRoas float64) BiddingStrategy {
 		}
 	}
 }
+
+func BiddingTargetSpend() BiddingStrategy {
+	return func(campaign *resources.Campaign) {
+		campaign.CampaignBiddingStrategy = &resources.Campaign_TargetSpend{
+			TargetSpend: &common.TargetSpend{},
+		}
+	}
+}
