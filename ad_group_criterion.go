@@ -34,13 +34,13 @@ func NewAdGroupCriteria() AdGroupCriteria {
 	return make(AdGroupCriteria, 0)
 }
 
-func (agcs AdGroupCriteria) Add(criterion *AdGroupCriterion) {
-	agcs = append(agcs, &AdGroupCriterion{&resources.AdGroupCriterion{
+func (agcs *AdGroupCriteria) Add(criterion *AdGroupCriterion) {
+	*agcs = append(*agcs, &AdGroupCriterion{&resources.AdGroupCriterion{
 		Criterion: criterion.GetCriterion(),
 	}})
 }
 
-func (agcs AdGroupCriteria) AddKeyword(keyword string, matchType KeywordMatchType) {
+func (agcs *AdGroupCriteria) AddKeyword(keyword string, matchType KeywordMatchType) {
 	k := &common.KeywordInfo{
 		Text: String(keyword),
 	}

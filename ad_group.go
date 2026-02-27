@@ -26,6 +26,14 @@ func NewAdGroup() *AdGroup {
 	}
 }
 
+func (ag AdGroup) GetName() string {
+	return ag.AdGroup.GetName()
+}
+
+func (ag *AdGroup) SetName(name string) {
+	ag.AdGroup.Name = String(name)
+}
+
 func (ag *AdGroup) createOperation(tempId tempIdGenerator) *services.MutateOperation {
 	ag.ResourceName = fmt.Sprintf("customers/%s/adGroups/%s", ag.Campaign.Customer.GetId(), tempId())
 	ag.AdGroup.Campaign = String(ag.Campaign.GetResourceName())

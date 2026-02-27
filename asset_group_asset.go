@@ -45,8 +45,8 @@ func NewAssetGroupAssets() AssetGroupAssets {
 	return make(AssetGroupAssets, 0)
 }
 
-func (aga AssetGroupAssets) Add(asset *AssetGroupAsset) {
-	aga = append(aga, &AssetGroupAsset{&resources.AssetGroupAsset{
+func (aga *AssetGroupAssets) Add(asset *AssetGroupAsset) {
+	*aga = append(*aga, &AssetGroupAsset{&resources.AssetGroupAsset{
 		FieldType: asset.GetFieldType(),
 	}, &Asset{&resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
@@ -54,7 +54,7 @@ func (aga AssetGroupAssets) Add(asset *AssetGroupAsset) {
 	}}})
 }
 
-func (aga AssetGroupAssets) AddSitelink(text, description1, description2 string, finalUrls ...string) {
+func (aga *AssetGroupAssets) AddSitelink(text, description1, description2 string, finalUrls ...string) {
 	aga.Add(&AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{
 			FieldType: enums.AssetFieldTypeEnum_SITELINK,
@@ -74,7 +74,7 @@ func (aga AssetGroupAssets) AddSitelink(text, description1, description2 string,
 	})
 }
 
-func (aga AssetGroupAssets) AddCallout(text string) {
+func (aga *AssetGroupAssets) AddCallout(text string) {
 	aga.Add(&AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{
 			FieldType: enums.AssetFieldTypeEnum_CALLOUT,
@@ -91,7 +91,7 @@ func (aga AssetGroupAssets) AddCallout(text string) {
 	})
 }
 
-func (aga AssetGroupAssets) AddCall(countryCode, phoneNumber string) {
+func (aga *AssetGroupAssets) AddCall(countryCode, phoneNumber string) {
 	aga.Add(&AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{
 			FieldType: enums.AssetFieldTypeEnum_CALL,
@@ -109,7 +109,7 @@ func (aga AssetGroupAssets) AddCall(countryCode, phoneNumber string) {
 	})
 }
 
-func (aga AssetGroupAssets) AddStructuredSnippet(header string, values ...string) {
+func (aga *AssetGroupAssets) AddStructuredSnippet(header string, values ...string) {
 	aga.Add(&AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{
 			FieldType: enums.AssetFieldTypeEnum_STRUCTURED_SNIPPET,
