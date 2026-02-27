@@ -26,12 +26,53 @@ func (c CampaignBudget) GetId() string {
 	return strconv.Itoa(int(c.CampaignBudget.GetId()))
 }
 
+func (c *CampaignBudget) SetId(id string) {
+	i, _ := strconv.ParseInt(id, 10, 64)
+	c.CampaignBudget.Id = Int64(i)
+}
+
+func (c CampaignBudget) GetName() string {
+	return c.CampaignBudget.GetName()
+}
+
+func (c *CampaignBudget) SetName(name string) {
+	c.CampaignBudget.Name = String(name)
+}
+
 func (c CampaignBudget) GetAmountCents() int {
 	return int(c.CampaignBudget.GetAmountMicros() / 10_000)
 }
 
 func (c *CampaignBudget) SetAmountCents(amount int) {
 	c.CampaignBudget.AmountMicros = Int64(int64(amount * 10_000))
+}
+
+func (c CampaignBudget) GetEnabled() bool {
+	return c.CampaignBudget.GetStatus() == enums.BudgetStatusEnum_ENABLED
+}
+
+func (c *CampaignBudget) SetEnabled(enabled bool) {
+	if enabled {
+		c.CampaignBudget.Status = enums.BudgetStatusEnum_ENABLED
+	} else {
+		c.CampaignBudget.Status = enums.BudgetStatusEnum_REMOVED
+	}
+}
+
+func (c CampaignBudget) IsExplicitlyShared() bool {
+	return c.CampaignBudget.GetExplicitlyShared()
+}
+
+func (c *CampaignBudget) SetExplicitlyShared(shared bool) {
+	c.CampaignBudget.ExplicitlyShared = Bool(shared)
+}
+
+func (c *CampaignBudget) SetDeliveryMethod(method CampaignBudgetDeliveryMethod) {
+	method(c.CampaignBudget)
+}
+
+func (c CampaignBudget) GetDeliveryMethod() enums.BudgetDeliveryMethodEnum_BudgetDeliveryMethod {
+	return c.CampaignBudget.GetDeliveryMethod()
 }
 
 func (c *CampaignBudget) createOperation(customer *Customer, tempId tempIdGenerator) *services.MutateOperation {
@@ -46,4 +87,14 @@ func (c *CampaignBudget) createOperation(customer *Customer, tempId tempIdGenera
 			},
 		},
 	}
+}
+
+type CampaignBudgetDeliveryMethod func(budget *resources.CampaignBudget)
+
+func BudgetDeliveryStandard(budget *resources.CampaignBudget) {
+	budget.DeliveryMethod = enums.BudgetDeliveryMethodEnum_STANDARD
+}
+
+func BudgetDeliveryAccelerated(budget *resources.CampaignBudget) {
+	budget.DeliveryMethod = enums.BudgetDeliveryMethodEnum_ACCELERATED
 }
