@@ -22,6 +22,22 @@ func NewAssetGroup() *AssetGroup {
 	}
 }
 
+func (ag AssetGroup) GetName() string {
+	return ag.AssetGroup.Name
+}
+
+func (ag *AssetGroup) SetName(name string) {
+	ag.AssetGroup.Name = name
+}
+
+func (ag AssetGroup) GetFinalUrls() []string {
+	return ag.AssetGroup.FinalUrls
+}
+
+func (ag *AssetGroup) SetFinalUrls(urls []string) {
+	ag.AssetGroup.FinalUrls = urls
+}
+
 func (ag *AssetGroup) createOperation(tempId tempIdGenerator) *services.MutateOperation {
 	ag.ResourceName = fmt.Sprintf("customers/%s/assetGroups/%s", ag.Campaign.Customer.GetId(), tempId())
 	ag.AssetGroup.Campaign = ag.Campaign.GetResourceName()

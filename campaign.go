@@ -66,6 +66,10 @@ func (c *Campaign) SetBudget(budget int) {
 	c.Budget.SetAmountCents(budget)
 }
 
+func (c Campaign) GetAdvertisingChannelType() enums.AdvertisingChannelTypeEnum_AdvertisingChannelType {
+	return c.Campaign.GetAdvertisingChannelType()
+}
+
 func (c *Campaign) SetAdvertisingChannel(channel AdvertisingChannel) {
 	channel(c.Campaign)
 }
@@ -97,6 +101,46 @@ func (c *Campaign) SetStartDate(date string) {
 
 func (c *Campaign) SetEndDate(date string) {
 	c.Campaign.EndDateTime = String(date)
+}
+
+func (c Campaign) GetStartDate() string {
+	return c.Campaign.GetStartDateTime()
+}
+
+func (c Campaign) GetEndDate() string {
+	return c.Campaign.GetEndDateTime()
+}
+
+func (c Campaign) IsBrandGuidelinesEnabled() bool {
+	return c.Campaign.GetBrandGuidelinesEnabled()
+}
+
+func (c Campaign) GetContainsEuPoliticalAdvertising() bool {
+	return c.Campaign.GetContainsEuPoliticalAdvertising() == enums.EuPoliticalAdvertisingStatusEnum_CONTAINS_EU_POLITICAL_ADVERTISING
+}
+
+func (c Campaign) GetTrackingUrl() string {
+	return c.Campaign.GetTrackingUrlTemplate()
+}
+
+func (c *Campaign) SetTrackingUrl(url string) {
+	c.Campaign.TrackingUrlTemplate = String(url)
+}
+
+func (c Campaign) GetFinalUrlSuffix() string {
+	return c.Campaign.GetFinalUrlSuffix()
+}
+
+func (c *Campaign) SetFinalUrlSuffix(suffix string) {
+	c.Campaign.FinalUrlSuffix = String(suffix)
+}
+
+func (c Campaign) GetBiddingStrategyType() enums.BiddingStrategyTypeEnum_BiddingStrategyType {
+	return c.Campaign.GetBiddingStrategyType()
+}
+
+func (c Campaign) GetAdServingOptimizationStatus() enums.AdServingOptimizationStatusEnum_AdServingOptimizationStatus {
+	return c.Campaign.GetAdServingOptimizationStatus()
 }
 
 func (c *Campaign) SetKeywordMatchType(matchType CampaignKeywordMatchType) {
