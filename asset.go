@@ -14,10 +14,6 @@ type Asset struct {
 	*resources.Asset
 }
 
-func NewAsset() *Asset {
-	return &Asset{&resources.Asset{}}
-}
-
 func (a *Asset) createOperation(customer *Customer, tempId tempIdGenerator) *services.MutateOperation {
 	a.ResourceName = fmt.Sprintf("customers/%s/assets/%s", customer.GetId(), tempId())
 

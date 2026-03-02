@@ -12,13 +12,6 @@ type CustomerAsset struct {
 	Asset *Asset
 }
 
-func NewCustomerAsset() *CustomerAsset {
-	return &CustomerAsset{
-		CustomerAsset: &resources.CustomerAsset{},
-		Asset:         NewAsset(),
-	}
-}
-
 func (c *CustomerAsset) createOperations(customer *Customer, tempId tempIdGenerator) []*services.MutateOperation {
 	aop := c.Asset.createOperation(customer, tempId)
 
@@ -39,10 +32,6 @@ func (c *CustomerAsset) createOperations(customer *Customer, tempId tempIdGenera
 }
 
 type CustomerAssets []*CustomerAsset
-
-func NewCustomerAssets() CustomerAssets {
-	return make(CustomerAssets, 0)
-}
 
 func (c *CustomerAssets) Add(asset *CustomerAsset) {
 	*c = append(*c, &CustomerAsset{&resources.CustomerAsset{
