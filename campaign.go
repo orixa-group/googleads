@@ -131,21 +131,25 @@ func (c *Campaign) ListAdGroups(ctx context.Context) (AdGroups, error) {
 	return ListAdGroups(ctx, c.Customer.GetId(), AdGroupsByCampaign(c.GetResourceName()))
 }
 
-func (c *Campaign) AddAssetGroup() *AssetGroup {
+func (c *Campaign) NewAssetGroup(name string) *AssetGroup {
 	return &AssetGroup{
-		AssetGroup: &resources.AssetGroup{},
-		Campaign:   c,
-		Assets:     NewAssetGroupAssets(),
+		AssetGroup: &resources.AssetGroup{
+			Name: name,
+		},
+		Campaign: c,
+		Assets:   make(AssetGroupAssets, 0),
 	}
 }
 
-func (c *Campaign) AddAdGroup() *AdGroup {
+func (c *Campaign) NewAdGroup(name string) *AdGroup {
 	return &AdGroup{
-		AdGroup:  &resources.AdGroup{},
+		AdGroup: &resources.AdGroup{
+			Name: String(name),
+		},
 		Campaign: c,
-		Criteria: NewAdGroupCriteria(),
-		Assets:   NewAdGroupAssets(),
-		Ads:      NewAdGroupAds(),
+		Criteria: make(AdGroupCriteria, 0),
+		Assets:   make(AdGroupAssets, 0),
+		Ads:      make(AdGroupAds, 0),
 	}
 }
 
