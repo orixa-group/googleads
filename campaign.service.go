@@ -26,7 +26,9 @@ func createCampaignInstance(row *services.GoogleAdsRow) *Campaign {
 			Customer: row.GetCustomer(),
 			Assets:   make(CustomerAssets, 0),
 		},
-		Criteria: make(CampaignCriteria, 0),
-		Assets:   make(CampaignAssets, 0),
+		Criteria:    make(CampaignCriteria, 0),
+		Assets:      make(CampaignAssets, 0),
+		AdGroups:    make(AdGroups, 0),
+		AssetGroups: make(AssetGroups, 0),
 	}
 }

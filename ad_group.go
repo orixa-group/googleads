@@ -97,9 +97,7 @@ func (ag *AdGroup) createOperation(tempId tempIdGenerator) *services.MutateOpera
 	}
 }
 
-func (ag *AdGroup) Create(ctx context.Context) error {
-	tempId := newTempIdGenerator()
-
+func (ag *AdGroup) createOperations(tempId tempIdGenerator) []*services.MutateOperation {
 	ops := make([]*services.MutateOperation, 0)
 
 	ops = append(ops, ag.createOperation(tempId))
@@ -107,9 +105,13 @@ func (ag *AdGroup) Create(ctx context.Context) error {
 	ops = append(ops, ag.Assets.createOperations(ag, tempId)...)
 	ops = append(ops, ag.Ads.createOperations(ag)...)
 
+	return ops
+}
+
+func (ag *AdGroup) Create(ctx context.Context) error {
 	resp, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
 		CustomerId:       ag.Campaign.Customer.GetId(),
-		MutateOperations: ops,
+		MutateOperations: ag.createOperations(newTempIdGenerator()),
 	})
 	if err != nil {
 		return err
@@ -123,3 +125,9 @@ func (ag *AdGroup) Create(ctx context.Context) error {
 }
 
 type AdGroups []*AdGroup
+
+func (ags AdGroups) createOperations(tempId tempIdGenerator) []*services.MutateOperation {
+	return Flatten(Map(ags, func(item *AdGroup) []*services.MutateOperation {
+		return item.createOperations(tempId)
+	}))
+}

@@ -13,10 +13,12 @@ import (
 
 type Campaign struct {
 	*resources.Campaign
-	Budget   *CampaignBudget
-	Customer *Customer
-	Criteria CampaignCriteria
-	Assets   CampaignAssets
+	Budget      *CampaignBudget
+	Customer    *Customer
+	Criteria    CampaignCriteria
+	Assets      CampaignAssets
+	AdGroups    AdGroups
+	AssetGroups AssetGroups
 	resource
 }
 
@@ -27,9 +29,11 @@ func NewCampaign(name string, enabled bool, budget int, channelType ChannelType)
 			DeliveryMethod:   enums.BudgetDeliveryMethodEnum_STANDARD,
 			ExplicitlyShared: Bool(false),
 		}},
-		Customer: &Customer{},
-		Criteria: make(CampaignCriteria, 0),
-		Assets:   make(CampaignAssets, 0),
+		Customer:    &Customer{},
+		Criteria:    make(CampaignCriteria, 0),
+		Assets:      make(CampaignAssets, 0),
+		AdGroups:    make(AdGroups, 0),
+		AssetGroups: make(AssetGroups, 0),
 	}
 
 	c.SetName(name)
@@ -185,17 +189,19 @@ func (c *Campaign) ListAdGroups(ctx context.Context) (AdGroups, error) {
 }
 
 func (c *Campaign) NewAssetGroup(name string) *AssetGroup {
-	return &AssetGroup{
+	ag := &AssetGroup{
 		AssetGroup: &resources.AssetGroup{
 			Name: name,
 		},
 		Campaign: c,
 		Assets:   make(AssetGroupAssets, 0),
 	}
+	c.AssetGroups = append(c.AssetGroups, ag)
+	return ag
 }
 
 func (c *Campaign) NewAdGroup(name string) *AdGroup {
-	return &AdGroup{
+	ag := &AdGroup{
 		AdGroup: &resources.AdGroup{
 			Name: String(name),
 		},
@@ -204,6 +210,8 @@ func (c *Campaign) NewAdGroup(name string) *AdGroup {
 		Assets:   make(AdGroupAssets, 0),
 		Ads:      make(AdGroupAds, 0),
 	}
+	c.AdGroups = append(c.AdGroups, ag)
+	return ag
 }
 
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
@@ -215,6 +223,8 @@ func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
 	ops = append(ops, c.createOperation(customer, c.Budget, tempId))
 	ops = append(ops, c.Criteria.createOperations(c)...)
 	ops = append(ops, c.Assets.createOperations(customer, c, tempId)...)
+	ops = append(ops, c.AdGroups.createOperations(tempId)...)
+	ops = append(ops, c.AssetGroups.createOperations(tempId)...)
 
 	resp, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
 		CustomerId:       customer.GetId(),
