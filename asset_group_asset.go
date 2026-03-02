@@ -12,13 +12,6 @@ type AssetGroupAsset struct {
 	Asset *Asset
 }
 
-func NewAssetGroupAsset() *AssetGroupAsset {
-	return &AssetGroupAsset{
-		AssetGroupAsset: &resources.AssetGroupAsset{},
-		Asset:           &Asset{&resources.Asset{}},
-	}
-}
-
 func (aga *AssetGroupAsset) createOperations(assetGroup *AssetGroup, tempId tempIdGenerator) []*services.MutateOperation {
 	aop := aga.Asset.createOperation(assetGroup.Campaign.Customer, tempId)
 

@@ -3,6 +3,7 @@ package googleads
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
@@ -12,6 +13,15 @@ type AssetGroup struct {
 	*resources.AssetGroup
 	Campaign *Campaign
 	Assets   AssetGroupAssets
+}
+
+func (ag AssetGroup) GetId() string {
+	return strconv.Itoa(int(ag.AssetGroup.GetId()))
+}
+
+func (ag *AssetGroup) SetId(id string) {
+	i, _ := strconv.ParseInt(id, 10, 64)
+	ag.AssetGroup.Id = i
 }
 
 func (ag *AssetGroup) SetName(name string) {
