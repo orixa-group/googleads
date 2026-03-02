@@ -10,7 +10,7 @@ func FetchCampaign(ctx context.Context, customerId string, filters ...CampaignFi
 	return Fetch(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder().Where(filters...).Build(), createCampaignInstance)
 }
 
-func ListCampaigns(ctx context.Context, customerId string, filters ...CampaignFilter) ([]*Campaign, error) {
+func ListCampaigns(ctx context.Context, customerId string, filters ...CampaignFilter) (Campaigns, error) {
 	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder().Where(filters...).Build(), createCampaignInstance)
 }
 
@@ -24,9 +24,9 @@ func createCampaignInstance(row *services.GoogleAdsRow) *Campaign {
 		Budget:   &CampaignBudget{row.GetCampaignBudget()},
 		Customer: &Customer{
 			Customer: row.GetCustomer(),
-			Assets:   NewCustomerAssets(),
+			Assets:   make(CustomerAssets, 0),
 		},
-		Criteria: NewCampaignCriteria(),
-		Assets:   NewCampaignAssets(),
+		Criteria: make(CampaignCriteria, 0),
+		Assets:   make(CampaignAssets, 0),
 	}
 }

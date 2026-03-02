@@ -12,13 +12,6 @@ type CampaignAsset struct {
 	Asset *Asset
 }
 
-func NewCampaignAsset() *CampaignAsset {
-	return &CampaignAsset{
-		CampaignAsset: &resources.CampaignAsset{},
-		Asset:         NewAsset(),
-	}
-}
-
 func (c *CampaignAsset) createOperations(customer *Customer, campaign *Campaign, tempId tempIdGenerator) []*services.MutateOperation {
 	aop := c.Asset.createOperation(customer, tempId)
 
@@ -40,10 +33,6 @@ func (c *CampaignAsset) createOperations(customer *Customer, campaign *Campaign,
 }
 
 type CampaignAssets []*CampaignAsset
-
-func NewCampaignAssets() CampaignAssets {
-	return make(CampaignAssets, 0)
-}
 
 func (c *CampaignAssets) Add(asset *CampaignAsset) {
 	*c = append(*c, &CampaignAsset{&resources.CampaignAsset{
@@ -109,22 +98,26 @@ func (c *CampaignAssets) AddCall(countryCode, phoneNumber string) {
 	})
 }
 
-func (c *CampaignAssets) AddStructuredSnippet(header string, values ...string) {
+func (c *CampaignAssets) AddImage(source AssetImageSource) error {
+	ia := &common.ImageAsset{}
+	if err := source(ia); err != nil {
+		return err
+	}
+
 	c.Add(&CampaignAsset{
 		CampaignAsset: &resources.CampaignAsset{
-			FieldType: enums.AssetFieldTypeEnum_STRUCTURED_SNIPPET,
+			FieldType: enums.AssetFieldTypeEnum_AD_IMAGE,
 		},
 		Asset: &Asset{
 			Asset: &resources.Asset{
-				AssetData: &resources.Asset_StructuredSnippetAsset{
-					StructuredSnippetAsset: &common.StructuredSnippetAsset{
-						Header: header,
-						Values: values,
-					},
+				AssetData: &resources.Asset_ImageAsset{
+					ImageAsset: ia,
 				},
 			},
 		},
 	})
+
+	return nil
 }
 
 func (c CampaignAssets) createOperations(customer *Customer, campaign *Campaign, tempId tempIdGenerator) []*services.MutateOperation {

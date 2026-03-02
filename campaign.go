@@ -18,14 +18,24 @@ type Campaign struct {
 	Assets   CampaignAssets
 }
 
-func NewCampaign() *Campaign {
-	return &Campaign{
+func NewCampaign(name string, enabled bool, budget int, channelType ChannelType) *Campaign {
+	c := &Campaign{
 		Campaign: &resources.Campaign{},
-		Budget:   NewCampaignBudget(),
+		Budget: &CampaignBudget{&resources.CampaignBudget{
+			DeliveryMethod:   enums.BudgetDeliveryMethodEnum_STANDARD,
+			ExplicitlyShared: Bool(false),
+		}},
 		Customer: &Customer{},
-		Criteria: NewCampaignCriteria(),
-		Assets:   NewCampaignAssets(),
+		Criteria: make(CampaignCriteria, 0),
+		Assets:   make(CampaignAssets, 0),
 	}
+
+	c.SetName(name)
+	c.SetEnabled(enabled)
+	c.SetBudget(budget)
+	c.SetChannelType(channelType)
+
+	return c
 }
 
 func (c Campaign) GetId() string {
@@ -35,10 +45,6 @@ func (c Campaign) GetId() string {
 func (c *Campaign) SetId(id string) {
 	i, _ := strconv.ParseInt(id, 10, 64)
 	c.Campaign.Id = Int64(i)
-}
-
-func (c Campaign) GetName() string {
-	return c.Campaign.GetName()
 }
 
 func (c *Campaign) SetName(name string) {
@@ -66,106 +72,47 @@ func (c *Campaign) SetBudget(budget int) {
 	c.Budget.SetAmountCents(budget)
 }
 
-func (c Campaign) GetAdvertisingChannelType() enums.AdvertisingChannelTypeEnum_AdvertisingChannelType {
-	return c.Campaign.GetAdvertisingChannelType()
+func (c Campaign) GetChannelType() ChannelType {
+	return enumToChannelType[c.Campaign.GetAdvertisingChannelType()]
 }
 
-func (c *Campaign) SetAdvertisingChannel(channel AdvertisingChannel) {
-	channel(c.Campaign)
-}
+func (c *Campaign) SetChannelType(channel ChannelType) {
+	c.Campaign.AdvertisingChannelType = channelTypeToEnum[channel]
 
-func (c *Campaign) SetNetworkSettings(settings ...NetworkSetting) {
-	if c.NetworkSettings == nil {
-		c.NetworkSettings = &resources.Campaign_NetworkSettings{}
-	}
-	for _, s := range settings {
-		s(c.NetworkSettings)
-	}
-}
-
-func (c *Campaign) SetContainsEuPoliticalAdvertising(containsEuPoliticalAdvertising bool) {
-	if containsEuPoliticalAdvertising {
-		c.Campaign.ContainsEuPoliticalAdvertising = enums.EuPoliticalAdvertisingStatusEnum_CONTAINS_EU_POLITICAL_ADVERTISING
-	} else {
-		c.Campaign.ContainsEuPoliticalAdvertising = enums.EuPoliticalAdvertisingStatusEnum_DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING
+	if channel.is(ChannelTypeSearch) {
+		c.Campaign.NetworkSettings = &resources.Campaign_NetworkSettings{
+			TargetGoogleSearch:         Bool(true),
+			TargetSearchNetwork:        Bool(true),
+			TargetContentNetwork:       Bool(false),
+			TargetPartnerSearchNetwork: Bool(false),
+			TargetYoutube:              Bool(false),
+			TargetGoogleTvNetwork:      Bool(false),
+		}
 	}
 }
 
-func (c *Campaign) SetBiddingStrategy(strategy BiddingStrategy) {
-	strategy(c.Campaign)
+func (c *Campaign) SetObjective(objective Objective) {
+	objectiveToEnum[objective](c)
 }
 
-func (c *Campaign) SetStartDate(date string) {
-	c.Campaign.StartDateTime = String(date)
-}
-
-func (c *Campaign) SetEndDate(date string) {
-	c.Campaign.EndDateTime = String(date)
+func (c Campaign) GetObjective() Objective {
+	return enumToObjective[c.Campaign.GetBiddingStrategyType()]
 }
 
 func (c Campaign) GetStartDate() string {
 	return c.Campaign.GetStartDateTime()
 }
 
+func (c *Campaign) SetStartDate(date string) {
+	c.Campaign.StartDateTime = String(date)
+}
+
 func (c Campaign) GetEndDate() string {
 	return c.Campaign.GetEndDateTime()
 }
 
-func (c Campaign) IsBrandGuidelinesEnabled() bool {
-	return c.Campaign.GetBrandGuidelinesEnabled()
-}
-
-func (c Campaign) GetContainsEuPoliticalAdvertising() bool {
-	return c.Campaign.GetContainsEuPoliticalAdvertising() == enums.EuPoliticalAdvertisingStatusEnum_CONTAINS_EU_POLITICAL_ADVERTISING
-}
-
-func (c Campaign) GetTrackingUrl() string {
-	return c.Campaign.GetTrackingUrlTemplate()
-}
-
-func (c *Campaign) SetTrackingUrl(url string) {
-	c.Campaign.TrackingUrlTemplate = String(url)
-}
-
-func (c Campaign) GetFinalUrlSuffix() string {
-	return c.Campaign.GetFinalUrlSuffix()
-}
-
-func (c *Campaign) SetFinalUrlSuffix(suffix string) {
-	c.Campaign.FinalUrlSuffix = String(suffix)
-}
-
-func (c Campaign) GetBiddingStrategyType() enums.BiddingStrategyTypeEnum_BiddingStrategyType {
-	return c.Campaign.GetBiddingStrategyType()
-}
-
-func (c Campaign) GetAdServingOptimizationStatus() enums.AdServingOptimizationStatusEnum_AdServingOptimizationStatus {
-	return c.Campaign.GetAdServingOptimizationStatus()
-}
-
-func (c *Campaign) SetKeywordMatchType(matchType CampaignKeywordMatchType) {
-	matchType(c.Campaign)
-}
-
-func (c *Campaign) SetGeoTargetTypeSetting(settings ...GeoTargetTypeSetting) {
-	if c.GeoTargetTypeSetting == nil {
-		c.GeoTargetTypeSetting = &resources.Campaign_GeoTargetTypeSetting{}
-	}
-	for _, s := range settings {
-		s(c.GeoTargetTypeSetting)
-	}
-}
-
-func (c *Campaign) SetBrandGuidelinesEnabled(enabled bool) {
-	c.BrandGuidelinesEnabled = Bool(enabled)
-}
-
-func (c *Campaign) SetAdServingOptimizationStatus(status AdServingOptimizationStatus) {
-	status(c.Campaign)
-}
-
-func (c *Campaign) AddLabel(labelResourceName string) {
-	c.Campaign.Labels = append(c.Campaign.Labels, labelResourceName)
+func (c *Campaign) SetEndDate(date string) {
+	c.Campaign.EndDateTime = String(date)
 }
 
 func (c *Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {
@@ -178,6 +125,10 @@ func (c *Campaign) ListAssets(ctx context.Context) (CampaignAssets, error) {
 
 func (c *Campaign) ListAssetGroups(ctx context.Context) (AssetGroups, error) {
 	return ListAssetGroups(ctx, c.Customer.GetId(), AssetGroupByCampaign(c.GetResourceName()))
+}
+
+func (c *Campaign) ListAdGroups(ctx context.Context) (AdGroups, error) {
+	return ListAdGroups(ctx, c.Customer.GetId(), AdGroupsByCampaign(c.GetResourceName()))
 }
 
 func (c *Campaign) AddAssetGroup() *AssetGroup {
