@@ -15,7 +15,7 @@ type AssetGroupAsset struct {
 func NewAssetGroupAsset() *AssetGroupAsset {
 	return &AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{},
-		Asset:           NewAsset(),
+		Asset:           &Asset{&resources.Asset{}},
 	}
 }
 
@@ -50,23 +50,47 @@ func (aga *AssetGroupAssets) Add(asset *AssetGroupAsset) {
 		FieldType: asset.GetFieldType(),
 	}, &Asset{&resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
-		FinalUrls: asset.Asset.GetFinalUrls(),
 	}}})
 }
 
-func (aga *AssetGroupAssets) AddSitelink(text, description1, description2 string, finalUrls ...string) {
+func (aga *AssetGroupAssets) AddHeadline(text string) {
+	aga.addTextAsset(text, enums.AssetFieldTypeEnum_HEADLINE)
+}
+
+func (aga *AssetGroupAssets) AddLongHeadline(text string) {
+	aga.addTextAsset(text, enums.AssetFieldTypeEnum_LONG_HEADLINE)
+}
+
+func (aga *AssetGroupAssets) AddDescription(text string) {
+	aga.addTextAsset(text, enums.AssetFieldTypeEnum_DESCRIPTION)
+}
+
+func (aga *AssetGroupAssets) AddBusinessName(text string) {
+	aga.addTextAsset(text, enums.AssetFieldTypeEnum_BUSINESS_NAME)
+}
+
+func (aga *AssetGroupAssets) AddMarketingImage(source AssetImageSource) error {
+	return aga.addImageAsset(source, enums.AssetFieldTypeEnum_MARKETING_IMAGE)
+}
+
+func (aga *AssetGroupAssets) AddSquareMarketingImage(source AssetImageSource) error {
+	return aga.addImageAsset(source, enums.AssetFieldTypeEnum_SQUARE_MARKETING_IMAGE)
+}
+
+func (aga *AssetGroupAssets) AddLogo(source AssetImageSource) error {
+	return aga.addImageAsset(source, enums.AssetFieldTypeEnum_LOGO)
+}
+
+func (aga *AssetGroupAssets) addTextAsset(text string, fieldType enums.AssetFieldTypeEnum_AssetFieldType) {
 	aga.Add(&AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{
-			FieldType: enums.AssetFieldTypeEnum_SITELINK,
+			FieldType: fieldType,
 		},
 		Asset: &Asset{
 			Asset: &resources.Asset{
-				FinalUrls: finalUrls,
-				AssetData: &resources.Asset_SitelinkAsset{
-					SitelinkAsset: &common.SitelinkAsset{
-						LinkText:     text,
-						Description1: description1,
-						Description2: description2,
+				AssetData: &resources.Asset_TextAsset{
+					TextAsset: &common.TextAsset{
+						Text: String(text),
 					},
 				},
 			},
@@ -74,57 +98,25 @@ func (aga *AssetGroupAssets) AddSitelink(text, description1, description2 string
 	})
 }
 
-func (aga *AssetGroupAssets) AddCallout(text string) {
-	aga.Add(&AssetGroupAsset{
-		AssetGroupAsset: &resources.AssetGroupAsset{
-			FieldType: enums.AssetFieldTypeEnum_CALLOUT,
-		},
-		Asset: &Asset{
-			Asset: &resources.Asset{
-				AssetData: &resources.Asset_CalloutAsset{
-					CalloutAsset: &common.CalloutAsset{
-						CalloutText: text,
-					},
-				},
-			},
-		},
-	})
-}
+func (aga *AssetGroupAssets) addImageAsset(source AssetImageSource, fieldType enums.AssetFieldTypeEnum_AssetFieldType) error {
+	ia := &common.ImageAsset{}
+	if err := source(ia); err != nil {
+		return err
+	}
 
-func (aga *AssetGroupAssets) AddCall(countryCode, phoneNumber string) {
 	aga.Add(&AssetGroupAsset{
 		AssetGroupAsset: &resources.AssetGroupAsset{
-			FieldType: enums.AssetFieldTypeEnum_CALL,
+			FieldType: fieldType,
 		},
 		Asset: &Asset{
 			Asset: &resources.Asset{
-				AssetData: &resources.Asset_CallAsset{
-					CallAsset: &common.CallAsset{
-						CountryCode: countryCode,
-						PhoneNumber: phoneNumber,
-					},
+				AssetData: &resources.Asset_ImageAsset{
+					ImageAsset: ia,
 				},
 			},
 		},
 	})
-}
-
-func (aga *AssetGroupAssets) AddStructuredSnippet(header string, values ...string) {
-	aga.Add(&AssetGroupAsset{
-		AssetGroupAsset: &resources.AssetGroupAsset{
-			FieldType: enums.AssetFieldTypeEnum_STRUCTURED_SNIPPET,
-		},
-		Asset: &Asset{
-			Asset: &resources.Asset{
-				AssetData: &resources.Asset_StructuredSnippetAsset{
-					StructuredSnippetAsset: &common.StructuredSnippetAsset{
-						Header: header,
-						Values: values,
-					},
-				},
-			},
-		},
-	})
+	return nil
 }
 
 func (aga AssetGroupAssets) createOperations(assetGroup *AssetGroup, tempId tempIdGenerator) []*services.MutateOperation {

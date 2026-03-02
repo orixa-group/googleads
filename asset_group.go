@@ -14,24 +14,8 @@ type AssetGroup struct {
 	Assets   AssetGroupAssets
 }
 
-func NewAssetGroup() *AssetGroup {
-	return &AssetGroup{
-		AssetGroup: &resources.AssetGroup{},
-		Campaign:   NewCampaign(),
-		Assets:     NewAssetGroupAssets(),
-	}
-}
-
-func (ag AssetGroup) GetName() string {
-	return ag.AssetGroup.Name
-}
-
 func (ag *AssetGroup) SetName(name string) {
 	ag.AssetGroup.Name = name
-}
-
-func (ag AssetGroup) GetFinalUrls() []string {
-	return ag.AssetGroup.FinalUrls
 }
 
 func (ag *AssetGroup) SetFinalUrls(urls []string) {
@@ -69,7 +53,3 @@ func (ag *AssetGroup) Create(ctx context.Context) error {
 }
 
 type AssetGroups []*AssetGroup
-
-func NewAssetGroups() AssetGroups {
-	return make(AssetGroups, 0)
-}
