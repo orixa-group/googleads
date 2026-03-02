@@ -6,10 +6,12 @@ import (
 
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type CampaignBudget struct {
 	*resources.CampaignBudget
+	resource
 }
 
 func (c CampaignBudget) GetId() string {
@@ -23,6 +25,7 @@ func (c *CampaignBudget) SetId(id string) {
 
 func (c *CampaignBudget) SetName(name string) {
 	c.CampaignBudget.Name = String(name)
+	c.addUpdatedField("name")
 }
 
 func (c CampaignBudget) GetAmountCents() int {
@@ -31,6 +34,22 @@ func (c CampaignBudget) GetAmountCents() int {
 
 func (c *CampaignBudget) SetAmountCents(amount int) {
 	c.CampaignBudget.AmountMicros = Int64(int64(amount * 10_000))
+	c.addUpdatedField("amount_micros")
+}
+
+func (c *CampaignBudget) updateOperation(paths []string) *services.MutateOperation {
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_CampaignBudgetOperation{
+			CampaignBudgetOperation: &services.CampaignBudgetOperation{
+				Operation: &services.CampaignBudgetOperation_Update{
+					Update: c.CampaignBudget,
+				},
+				UpdateMask: &fieldmaskpb.FieldMask{
+					Paths: paths,
+				},
+			},
+		},
+	}
 }
 
 func (c *CampaignBudget) createOperation(customer *Customer, tempId tempIdGenerator) *services.MutateOperation {

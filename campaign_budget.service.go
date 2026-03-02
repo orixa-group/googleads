@@ -15,5 +15,5 @@ func ListCampaignBudgets(ctx context.Context, customerId string, filters ...Camp
 }
 
 func createCampaignBudgetInstance(row *services.GoogleAdsRow) *CampaignBudget {
-	return &CampaignBudget{row.GetCampaignBudget()}
+	return &CampaignBudget{CampaignBudget: row.GetCampaignBudget()}
 }

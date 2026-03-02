@@ -8,6 +8,7 @@ import (
 	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type Campaign struct {
@@ -16,12 +17,13 @@ type Campaign struct {
 	Customer *Customer
 	Criteria CampaignCriteria
 	Assets   CampaignAssets
+	resource
 }
 
 func NewCampaign(name string, enabled bool, budget int, channelType ChannelType) *Campaign {
 	c := &Campaign{
 		Campaign: &resources.Campaign{},
-		Budget: &CampaignBudget{&resources.CampaignBudget{
+		Budget: &CampaignBudget{CampaignBudget: &resources.CampaignBudget{
 			DeliveryMethod:   enums.BudgetDeliveryMethodEnum_STANDARD,
 			ExplicitlyShared: Bool(false),
 		}},
@@ -49,7 +51,8 @@ func (c *Campaign) SetId(id string) {
 
 func (c *Campaign) SetName(name string) {
 	c.Campaign.Name = String(name)
-	c.Budget.Name = String(name)
+	c.Budget.SetName(name)
+	c.addUpdatedField("name")
 }
 
 func (c Campaign) GetEnabled() bool {
@@ -62,6 +65,7 @@ func (c *Campaign) SetEnabled(enabled bool) {
 	} else {
 		c.Campaign.Status = enums.CampaignStatusEnum_PAUSED
 	}
+	c.addUpdatedField("status")
 }
 
 func (c Campaign) GetBudget() int {
@@ -93,6 +97,7 @@ func (c *Campaign) SetChannelType(channel ChannelType) {
 
 func (c *Campaign) SetObjective(objective Objective) {
 	objectiveToEnum[objective](c)
+	c.addUpdatedField("campaign_bidding_strategy")
 }
 
 func (c Campaign) GetObjective() Objective {
@@ -105,6 +110,7 @@ func (c Campaign) GetStartDate() string {
 
 func (c *Campaign) SetStartDate(date string) {
 	c.Campaign.StartDateTime = String(date)
+	c.addUpdatedField("start_date_time")
 }
 
 func (c Campaign) GetEndDate() string {
@@ -113,6 +119,53 @@ func (c Campaign) GetEndDate() string {
 
 func (c *Campaign) SetEndDate(date string) {
 	c.Campaign.EndDateTime = String(date)
+	c.addUpdatedField("end_date_time")
+}
+
+func (c *Campaign) Save(ctx context.Context) error {
+	if c.isNew(c.GetId()) {
+		return c.Create(ctx, c.Customer)
+	}
+	return c.Update(ctx)
+}
+
+func (c *Campaign) Update(ctx context.Context) error {
+	ops := make([]*services.MutateOperation, 0)
+
+	paths := c.getUpdatedFields()
+	if len(paths) > 0 {
+		ops = append(ops, c.updateOperation(paths))
+	}
+
+	budgetPaths := c.Budget.getUpdatedFields()
+	if len(budgetPaths) > 0 {
+		ops = append(ops, c.Budget.updateOperation(budgetPaths))
+	}
+
+	if len(ops) == 0 {
+		return nil
+	}
+
+	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+		CustomerId:       c.Customer.GetId(),
+		MutateOperations: ops,
+	})
+	return err
+}
+
+func (c *Campaign) updateOperation(paths []string) *services.MutateOperation {
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_CampaignOperation{
+			CampaignOperation: &services.CampaignOperation{
+				Operation: &services.CampaignOperation_Update{
+					Update: c.Campaign,
+				},
+				UpdateMask: &fieldmaskpb.FieldMask{
+					Paths: paths,
+				},
+			},
+		},
+	}
 }
 
 func (c *Campaign) ListCriteria(ctx context.Context) (CampaignCriteria, error) {

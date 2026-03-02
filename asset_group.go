@@ -4,16 +4,19 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type AssetGroup struct {
 	*resources.AssetGroup
 	Campaign *Campaign
 	Assets   AssetGroupAssets
+	resource
 }
 
 func (ag AssetGroup) GetId() string {
@@ -27,12 +30,47 @@ func (ag *AssetGroup) SetId(id string) {
 
 func (ag *AssetGroup) SetName(name string) {
 	ag.AssetGroup.Name = name
+	ag.addUpdatedField("name")
 }
 
 func (ag *AssetGroup) SetFinalUrls(urls []string) {
 	ag.AssetGroup.FinalUrls = urls
+	ag.addUpdatedField("final_urls")
 }
 
+func (ag *AssetGroup) Save(ctx context.Context) error {
+	if ag.isNew(ag.GetId()) {
+		return ag.Create(ctx)
+	}
+	return ag.Update(ctx)
+}
+
+func (ag *AssetGroup) Update(ctx context.Context) error {
+	paths := ag.getUpdatedFields()
+	if len(paths) == 0 {
+		return nil
+	}
+	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+		CustomerId:       ag.Campaign.Customer.GetId(),
+		MutateOperations: []*services.MutateOperation{ag.updateOperation(paths)},
+	})
+	return err
+}
+
+func (ag *AssetGroup) updateOperation(paths []string) *services.MutateOperation {
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_AssetGroupOperation{
+			AssetGroupOperation: &services.AssetGroupOperation{
+				Operation: &services.AssetGroupOperation_Update{
+					Update: ag.AssetGroup,
+				},
+				UpdateMask: &fieldmaskpb.FieldMask{
+					Paths: paths,
+				},
+			},
+		},
+	}
+}
 func (ag AssetGroup) GetEnabled() bool {
 	return ag.AssetGroup.GetStatus() == enums.AssetGroupStatusEnum_ENABLED
 }
@@ -43,6 +81,7 @@ func (ag *AssetGroup) SetEnabled(enabled bool) {
 	} else {
 		ag.AssetGroup.Status = enums.AssetGroupStatusEnum_PAUSED
 	}
+	ag.addUpdatedField("status")
 }
 
 func (ag *AssetGroup) createOperation(tempId tempIdGenerator) *services.MutateOperation {
@@ -68,11 +107,19 @@ func (ag *AssetGroup) Create(ctx context.Context) error {
 	ops = append(ops, ag.createOperation(tempId))
 	ops = append(ops, ag.Assets.createOperations(ag, tempId)...)
 
-	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+	resp, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
 		CustomerId:       ag.Campaign.Customer.GetId(),
 		MutateOperations: ops,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	res := resp.GetMutateOperationResponses()[0].GetAssetGroupResult()
+	ag.ResourceName = res.GetResourceName()
+	ag.SetId(strings.Split(ag.ResourceName, "/")[3])
+
+	return nil
 }
 
 type AssetGroups []*AssetGroup

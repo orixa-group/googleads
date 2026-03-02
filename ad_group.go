@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type AdGroup struct {
@@ -16,6 +18,7 @@ type AdGroup struct {
 	Criteria AdGroupCriteria
 	Assets   AdGroupAssets
 	Ads      AdGroupAds
+	resource
 }
 
 func (ag AdGroup) GetId() string {
@@ -29,6 +32,7 @@ func (ag *AdGroup) SetId(id string) {
 
 func (ag *AdGroup) SetName(name string) {
 	ag.AdGroup.Name = String(name)
+	ag.addUpdatedField("name")
 }
 
 func (ag AdGroup) GetEnabled() bool {
@@ -40,6 +44,41 @@ func (ag *AdGroup) SetEnabled(enabled bool) {
 		ag.AdGroup.Status = enums.AdGroupStatusEnum_ENABLED
 	} else {
 		ag.AdGroup.Status = enums.AdGroupStatusEnum_PAUSED
+	}
+	ag.addUpdatedField("status")
+}
+
+func (ag *AdGroup) Save(ctx context.Context) error {
+	if ag.isNew(ag.GetId()) {
+		return ag.Create(ctx)
+	}
+	return ag.Update(ctx)
+}
+
+func (ag *AdGroup) Update(ctx context.Context) error {
+	paths := ag.getUpdatedFields()
+	if len(paths) == 0 {
+		return nil
+	}
+	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+		CustomerId:       ag.Campaign.Customer.GetId(),
+		MutateOperations: []*services.MutateOperation{ag.updateOperation(paths)},
+	})
+	return err
+}
+
+func (ag *AdGroup) updateOperation(paths []string) *services.MutateOperation {
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_AdGroupOperation{
+			AdGroupOperation: &services.AdGroupOperation{
+				Operation: &services.AdGroupOperation_Update{
+					Update: ag.AdGroup,
+				},
+				UpdateMask: &fieldmaskpb.FieldMask{
+					Paths: paths,
+				},
+			},
+		},
 	}
 }
 
@@ -68,11 +107,19 @@ func (ag *AdGroup) Create(ctx context.Context) error {
 	ops = append(ops, ag.Assets.createOperations(ag, tempId)...)
 	ops = append(ops, ag.Ads.createOperations(ag)...)
 
-	_, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
+	resp, err := services.NewGoogleAdsServiceClient(instance.conn).Mutate(ctx, &services.MutateGoogleAdsRequest{
 		CustomerId:       ag.Campaign.Customer.GetId(),
 		MutateOperations: ops,
 	})
-	return err
+	if err != nil {
+		return err
+	}
+
+	res := resp.GetMutateOperationResponses()[0].GetAdGroupResult()
+	ag.ResourceName = res.GetResourceName()
+	ag.SetId(strings.Split(ag.ResourceName, "/")[3])
+
+	return nil
 }
 
 type AdGroups []*AdGroup

@@ -21,7 +21,7 @@ func CreateCampaign(ctx context.Context, customer *Customer, campaign *Campaign)
 func createCampaignInstance(row *services.GoogleAdsRow) *Campaign {
 	return &Campaign{
 		Campaign: row.GetCampaign(),
-		Budget:   &CampaignBudget{row.GetCampaignBudget()},
+		Budget:   &CampaignBudget{CampaignBudget: row.GetCampaignBudget()},
 		Customer: &Customer{
 			Customer: row.GetCustomer(),
 			Assets:   make(CustomerAssets, 0),
