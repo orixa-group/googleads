@@ -18,16 +18,6 @@ type AdGroup struct {
 	Ads      AdGroupAds
 }
 
-func NewAdGroup() *AdGroup {
-	return &AdGroup{
-		AdGroup:  &resources.AdGroup{},
-		Campaign: NewCampaign(),
-		Criteria: NewAdGroupCriteria(),
-		Assets:   NewAdGroupAssets(),
-		Ads:      NewAdGroupAds(),
-	}
-}
-
 func (ag AdGroup) GetId() string {
 	return strconv.Itoa(int(ag.AdGroup.GetId()))
 }
@@ -35,10 +25,6 @@ func (ag AdGroup) GetId() string {
 func (ag *AdGroup) SetId(id string) {
 	i, _ := strconv.ParseInt(id, 10, 64)
 	ag.AdGroup.Id = Int64(i)
-}
-
-func (ag AdGroup) GetName() string {
-	return ag.AdGroup.GetName()
 }
 
 func (ag *AdGroup) SetName(name string) {
@@ -55,78 +41,6 @@ func (ag *AdGroup) SetEnabled(enabled bool) {
 	} else {
 		ag.AdGroup.Status = enums.AdGroupStatusEnum_PAUSED
 	}
-}
-
-func (ag AdGroup) GetCpcBidCents() int {
-	return int(ag.AdGroup.GetCpcBidMicros() / 10_000)
-}
-
-func (ag *AdGroup) SetCpcBidCents(cents int) {
-	ag.AdGroup.CpcBidMicros = Int64(int64(cents * 10_000))
-}
-
-func (ag AdGroup) IsOptimizedTargetingEnabled() bool {
-	return ag.AdGroup.GetOptimizedTargetingEnabled()
-}
-
-func (ag *AdGroup) SetOptimizedTargetingEnabled(enabled bool) {
-	ag.AdGroup.OptimizedTargetingEnabled = enabled
-}
-
-func (ag AdGroup) GetTrackingUrl() string {
-	return ag.AdGroup.GetTrackingUrlTemplate()
-}
-
-func (ag *AdGroup) SetTrackingUrl(url string) {
-	ag.AdGroup.TrackingUrlTemplate = String(url)
-}
-
-func (ag AdGroup) GetFinalUrlSuffix() string {
-	return ag.AdGroup.GetFinalUrlSuffix()
-}
-
-func (ag *AdGroup) SetFinalUrlSuffix(suffix string) {
-	ag.AdGroup.FinalUrlSuffix = String(suffix)
-}
-
-func (ag AdGroup) GetType() enums.AdGroupTypeEnum_AdGroupType {
-	return ag.AdGroup.GetType()
-}
-
-func (ag AdGroup) GetAdRotationMode() enums.AdGroupAdRotationModeEnum_AdGroupAdRotationMode {
-	return ag.AdGroup.GetAdRotationMode()
-}
-
-type AdGroupType func(ag *resources.AdGroup)
-
-func (ag *AdGroup) SetType(fn AdGroupType) {
-	fn(ag.AdGroup)
-}
-
-type AdGroupAdRotationMode func(ag *resources.AdGroup)
-
-func (ag *AdGroup) SetAdRotationMode(fn AdGroupAdRotationMode) {
-	fn(ag.AdGroup)
-}
-
-func AdGroupTypeSearchStandard(ag *resources.AdGroup) {
-	ag.Type = enums.AdGroupTypeEnum_SEARCH_STANDARD
-}
-
-func AdGroupTypeSearchDynamic(ag *resources.AdGroup) {
-	ag.Type = enums.AdGroupTypeEnum_SEARCH_DYNAMIC_ADS
-}
-
-func AdGroupTypeDisplayStandard(ag *resources.AdGroup) {
-	ag.Type = enums.AdGroupTypeEnum_DISPLAY_STANDARD
-}
-
-func AdGroupRotationOptimize(ag *resources.AdGroup) {
-	ag.AdRotationMode = enums.AdGroupAdRotationModeEnum_OPTIMIZE
-}
-
-func AdGroupRotationRotateForever(ag *resources.AdGroup) {
-	ag.AdRotationMode = enums.AdGroupAdRotationModeEnum_ROTATE_FOREVER
 }
 
 func (ag *AdGroup) createOperation(tempId tempIdGenerator) *services.MutateOperation {
@@ -162,7 +76,3 @@ func (ag *AdGroup) Create(ctx context.Context) error {
 }
 
 type AdGroups []*AdGroup
-
-func NewAdGroups() AdGroups {
-	return make(AdGroups, 0)
-}

@@ -34,10 +34,6 @@ func (aga *AssetGroupAsset) createOperations(assetGroup *AssetGroup, tempId temp
 
 type AssetGroupAssets []*AssetGroupAsset
 
-func NewAssetGroupAssets() AssetGroupAssets {
-	return make(AssetGroupAssets, 0)
-}
-
 func (aga *AssetGroupAssets) Add(asset *AssetGroupAsset) {
 	*aga = append(*aga, &AssetGroupAsset{&resources.AssetGroupAsset{
 		FieldType: asset.GetFieldType(),

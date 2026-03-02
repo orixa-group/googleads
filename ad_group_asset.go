@@ -12,13 +12,6 @@ type AdGroupAsset struct {
 	Asset *Asset
 }
 
-func NewAdGroupAsset() *AdGroupAsset {
-	return &AdGroupAsset{
-		AdGroupAsset: &resources.AdGroupAsset{},
-		Asset:        NewAsset(),
-	}
-}
-
 func (aga *AdGroupAsset) createOperations(adGroup *AdGroup, tempId tempIdGenerator) []*services.MutateOperation {
 	aop := aga.Asset.createOperation(adGroup.Campaign.Customer, tempId)
 
@@ -40,10 +33,6 @@ func (aga *AdGroupAsset) createOperations(adGroup *AdGroup, tempId tempIdGenerat
 }
 
 type AdGroupAssets []*AdGroupAsset
-
-func NewAdGroupAssets() AdGroupAssets {
-	return make(AdGroupAssets, 0)
-}
 
 func (agas *AdGroupAssets) Add(asset *AdGroupAsset) {
 	*agas = append(*agas, &AdGroupAsset{&resources.AdGroupAsset{
@@ -109,22 +98,26 @@ func (agas *AdGroupAssets) AddCall(countryCode, phoneNumber string) {
 	})
 }
 
-func (agas *AdGroupAssets) AddStructuredSnippet(header string, values ...string) {
+func (agas *AdGroupAssets) AddImage(source AssetImageSource) error {
+	ia := &common.ImageAsset{}
+	if err := source(ia); err != nil {
+		return err
+	}
+
 	agas.Add(&AdGroupAsset{
 		AdGroupAsset: &resources.AdGroupAsset{
-			FieldType: enums.AssetFieldTypeEnum_STRUCTURED_SNIPPET,
+			FieldType: enums.AssetFieldTypeEnum_AD_IMAGE,
 		},
 		Asset: &Asset{
 			Asset: &resources.Asset{
-				AssetData: &resources.Asset_StructuredSnippetAsset{
-					StructuredSnippetAsset: &common.StructuredSnippetAsset{
-						Header: header,
-						Values: values,
-					},
+				AssetData: &resources.Asset_ImageAsset{
+					ImageAsset: ia,
 				},
 			},
 		},
 	})
+
+	return nil
 }
 
 func (agas AdGroupAssets) createOperations(adGroup *AdGroup, tempId tempIdGenerator) []*services.MutateOperation {
