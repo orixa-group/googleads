@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/shenzhencenter/google-ads-pb/enums"
 	"github.com/shenzhencenter/google-ads-pb/resources"
 	"github.com/shenzhencenter/google-ads-pb/services"
 )
@@ -30,6 +31,18 @@ func (ag *AssetGroup) SetName(name string) {
 
 func (ag *AssetGroup) SetFinalUrls(urls []string) {
 	ag.AssetGroup.FinalUrls = urls
+}
+
+func (ag AssetGroup) GetEnabled() bool {
+	return ag.AssetGroup.GetStatus() == enums.AssetGroupStatusEnum_ENABLED
+}
+
+func (ag *AssetGroup) SetEnabled(enabled bool) {
+	if enabled {
+		ag.AssetGroup.Status = enums.AssetGroupStatusEnum_ENABLED
+	} else {
+		ag.AssetGroup.Status = enums.AssetGroupStatusEnum_PAUSED
+	}
 }
 
 func (ag *AssetGroup) createOperation(tempId tempIdGenerator) *services.MutateOperation {
