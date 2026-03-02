@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/shenzhencenter/google-ads-pb/common"
 	"github.com/shenzhencenter/google-ads-pb/resources"
@@ -12,6 +13,15 @@ import (
 
 type Asset struct {
 	*resources.Asset
+}
+
+func (a Asset) GetId() string {
+	return strconv.Itoa(int(a.Asset.GetId()))
+}
+
+func (a *Asset) SetId(id string) {
+	i, _ := strconv.ParseInt(id, 10, 64)
+	a.Asset.Id = Int64(i)
 }
 
 func (a *Asset) createOperation(customer *Customer, tempId tempIdGenerator) *services.MutateOperation {
