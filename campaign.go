@@ -22,24 +22,40 @@ type Campaign struct {
 	resource
 }
 
-func NewCampaign(name string, enabled bool, budget int, channelType ChannelType) *Campaign {
-	c := &Campaign{
-		Campaign: &resources.Campaign{},
-		Budget: &CampaignBudget{CampaignBudget: &resources.CampaignBudget{
-			DeliveryMethod:   enums.BudgetDeliveryMethodEnum_STANDARD,
-			ExplicitlyShared: Bool(false),
-		}},
+func NewEmptyCampaign() *Campaign {
+	return &Campaign{
+		Campaign:    &resources.Campaign{},
+		Budget:      &CampaignBudget{CampaignBudget: &resources.CampaignBudget{}},
 		Customer:    &Customer{},
 		Criteria:    make(CampaignCriteria, 0),
 		Assets:      make(CampaignAssets, 0),
 		AdGroups:    make(AdGroups, 0),
 		AssetGroups: make(AssetGroups, 0),
 	}
+}
+
+func NewSearchCampaign(name string, enabled bool, budget int) *Campaign {
+	c := NewEmptyCampaign()
+	c.Budget.DeliveryMethod = enums.BudgetDeliveryMethodEnum_STANDARD
+	c.Budget.ExplicitlyShared = Bool(false)
 
 	c.SetName(name)
 	c.SetEnabled(enabled)
 	c.SetBudget(budget)
-	c.SetChannelType(channelType)
+	c.SetChannelType(ChannelTypeSearch)
+
+	return c
+}
+
+func NewPerformanceMaxCampaign(name string, enabled bool, budget int) *Campaign {
+	c := NewEmptyCampaign()
+	c.Budget.DeliveryMethod = enums.BudgetDeliveryMethodEnum_STANDARD
+	c.Budget.ExplicitlyShared = Bool(false)
+
+	c.SetName(name)
+	c.SetEnabled(enabled)
+	c.SetBudget(budget)
+	c.SetChannelType(ChannelTypePerformanceMax)
 
 	return c
 }
