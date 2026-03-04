@@ -38,6 +38,10 @@ func (ag *AssetGroup) SetFinalUrls(urls []string) {
 	ag.addUpdatedField("final_urls")
 }
 
+func (ag *AssetGroup) ListAssets(ctx context.Context) (AssetGroupAssets, error) {
+	return ListAssetGroupAssets(ctx, ag.Campaign.Customer.GetId(), AssetGroupAssetByAssetGroup(ag.GetResourceName()))
+}
+
 func (ag *AssetGroup) Save(ctx context.Context) error {
 	if ag.isNew(ag.GetId()) {
 		return ag.Create(ctx)
