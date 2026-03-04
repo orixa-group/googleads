@@ -48,6 +48,18 @@ func (ag *AdGroup) SetEnabled(enabled bool) {
 	ag.addUpdatedField("status")
 }
 
+func (ag *AdGroup) ListCriteria(ctx context.Context) (AdGroupCriteria, error) {
+	return ListAdGroupCriteria(ctx, ag.Campaign.Customer.GetId(), AdGroupCriterionByAdGroup(ag.GetResourceName()))
+}
+
+func (ag *AdGroup) ListAssets(ctx context.Context) (AdGroupAssets, error) {
+	return ListAdGroupAssets(ctx, ag.Campaign.Customer.GetId(), AdGroupAssetByAdGroup(ag.GetResourceName()))
+}
+
+func (ag *AdGroup) ListAds(ctx context.Context) (AdGroupAds, error) {
+	return ListAdGroupAds(ctx, ag.Campaign.Customer.GetId(), AdGroupAdByAdGroup(ag.GetResourceName()))
+}
+
 func (ag *AdGroup) Save(ctx context.Context) error {
 	if ag.isNew(ag.GetId()) {
 		return ag.Create(ctx)
