@@ -29,7 +29,10 @@ type AdGroupAds []*AdGroupAd
 func (agas *AdGroupAds) Add(ad *resources.Ad) {
 	*agas = append(*agas, &AdGroupAd{
 		AdGroupAd: &resources.AdGroupAd{
-			Ad: ad,
+			Ad: &resources.Ad{
+				FinalUrls: ad.FinalUrls,
+				AdData:    ad.AdData,
+			},
 		},
 	})
 }
