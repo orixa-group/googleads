@@ -43,6 +43,7 @@ func NewSearchCampaign(name string, enabled bool, budget int) *Campaign {
 	c.SetEnabled(enabled)
 	c.SetBudget(budget)
 	c.SetChannelType(ChannelTypeSearch)
+	c.ContainsEuPoliticalAdvertising = enums.EuPoliticalAdvertisingStatusEnum_DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING
 
 	return c
 }
@@ -56,6 +57,7 @@ func NewPerformanceMaxCampaign(name string, enabled bool, budget int) *Campaign 
 	c.SetEnabled(enabled)
 	c.SetBudget(budget)
 	c.SetChannelType(ChannelTypePerformanceMax)
+	c.ContainsEuPoliticalAdvertising = enums.EuPoliticalAdvertisingStatusEnum_DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING
 
 	return c
 }
