@@ -142,6 +142,14 @@ func (c *Campaign) SetEndDate(date string) {
 	c.addUpdatedField("end_date_time")
 }
 
+func (c *Campaign) IsPMax() bool {
+	return c.GetChannelType().is(ChannelTypePerformanceMax)
+}
+
+func (c *Campaign) IsSearch() bool {
+	return c.GetChannelType().is(ChannelTypeSearch)
+}
+
 func (c *Campaign) Save(ctx context.Context) error {
 	if c.isNew(c.GetId()) {
 		return c.Create(ctx, c.Customer)
