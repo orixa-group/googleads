@@ -26,10 +26,15 @@ func (agc *AdGroupCriterion) createOperation(adGroup *AdGroup) *services.MutateO
 
 type AdGroupCriteria []*AdGroupCriterion
 
-func (agcs *AdGroupCriteria) Add(criterion *AdGroupCriterion) {
-	*agcs = append(*agcs, &AdGroupCriterion{&resources.AdGroupCriterion{
+func (agcs *AdGroupCriteria) Add(criterion *AdGroupCriterion, options ...AdGroupCriterionOption) {
+	ac := &resources.AdGroupCriterion{
 		Criterion: criterion.GetCriterion(),
-	}})
+	}
+	for _, opt := range options {
+		opt(ac)
+	}
+
+	*agcs = append(*agcs, &AdGroupCriterion{ac})
 }
 
 func (agcs *AdGroupCriteria) AddKeyword(keyword string, matchType KeywordMatchType) {

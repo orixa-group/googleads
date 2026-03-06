@@ -27,10 +27,15 @@ func (c *CampaignCriterion) createOperation(campaign *Campaign) *services.Mutate
 
 type CampaignCriteria []*CampaignCriterion
 
-func (c *CampaignCriteria) Add(criterion *CampaignCriterion) {
-	*c = append(*c, &CampaignCriterion{&resources.CampaignCriterion{
+func (c *CampaignCriteria) Add(criterion *CampaignCriterion, options ...CampaignCriterionOption) {
+	cc := &resources.CampaignCriterion{
 		Criterion: criterion.GetCriterion(),
-	}})
+	}
+	for _, opt := range options {
+		opt(cc)
+	}
+
+	*c = append(*c, &CampaignCriterion{cc})
 }
 
 func (c *CampaignCriteria) AddLocationById(locationId string) {
