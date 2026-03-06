@@ -33,13 +33,18 @@ func (c *CustomerAsset) createOperations(customer *Customer, tempId tempIdGenera
 
 type CustomerAssets []*CustomerAsset
 
-func (c *CustomerAssets) Add(asset *CustomerAsset) {
-	*c = append(*c, &CustomerAsset{&resources.CustomerAsset{
-		FieldType: asset.GetFieldType(),
-	}, &Asset{&resources.Asset{
+func (c *CustomerAssets) Add(asset *CustomerAsset, options ...AssetOption) {
+	a := &resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
 		FinalUrls: asset.Asset.GetFinalUrls(),
-	}}})
+	}
+	for _, opt := range options {
+		opt(a)
+	}
+
+	*c = append(*c, &CustomerAsset{&resources.CustomerAsset{
+		FieldType: asset.GetFieldType(),
+	}, &Asset{a}})
 }
 
 func (c *CustomerAssets) AddSitelink(text, finalUrl string, description string) {

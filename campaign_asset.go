@@ -34,13 +34,18 @@ func (c *CampaignAsset) createOperations(customer *Customer, campaign *Campaign,
 
 type CampaignAssets []*CampaignAsset
 
-func (c *CampaignAssets) Add(asset *CampaignAsset) {
-	*c = append(*c, &CampaignAsset{&resources.CampaignAsset{
-		FieldType: asset.GetFieldType(),
-	}, &Asset{&resources.Asset{
+func (c *CampaignAssets) Add(asset *CampaignAsset, options ...AssetOption) {
+	a := &resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
 		FinalUrls: asset.Asset.GetFinalUrls(),
-	}}})
+	}
+	for _, opt := range options {
+		opt(a)
+	}
+
+	*c = append(*c, &CampaignAsset{&resources.CampaignAsset{
+		FieldType: asset.GetFieldType(),
+	}, &Asset{a}})
 }
 
 func (c *CampaignAssets) AddSitelink(text, description1, description2 string, finalUrls ...string) {

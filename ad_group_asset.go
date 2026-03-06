@@ -34,13 +34,18 @@ func (aga *AdGroupAsset) createOperations(adGroup *AdGroup, tempId tempIdGenerat
 
 type AdGroupAssets []*AdGroupAsset
 
-func (agas *AdGroupAssets) Add(asset *AdGroupAsset) {
-	*agas = append(*agas, &AdGroupAsset{&resources.AdGroupAsset{
-		FieldType: asset.GetFieldType(),
-	}, &Asset{&resources.Asset{
+func (agas *AdGroupAssets) Add(asset *AdGroupAsset, options ...AssetOption) {
+	a := &resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
 		FinalUrls: asset.Asset.GetFinalUrls(),
-	}}})
+	}
+	for _, opt := range options {
+		opt(a)
+	}
+
+	*agas = append(*agas, &AdGroupAsset{&resources.AdGroupAsset{
+		FieldType: asset.GetFieldType(),
+	}, &Asset{a}})
 }
 
 func (agas *AdGroupAssets) AddSitelink(text, description1, description2 string, finalUrls ...string) {
