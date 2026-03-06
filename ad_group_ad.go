@@ -26,13 +26,18 @@ func (aga *AdGroupAd) createOperation(adGroup *AdGroup) *services.MutateOperatio
 
 type AdGroupAds []*AdGroupAd
 
-func (agas *AdGroupAds) Add(ad *resources.Ad) {
+func (agas *AdGroupAds) Add(ad *resources.Ad, options ...AdOption) {
+	a := &resources.Ad{
+		FinalUrls: ad.FinalUrls,
+		AdData:    ad.AdData,
+	}
+	for _, opt := range options {
+		opt(a)
+	}
+
 	*agas = append(*agas, &AdGroupAd{
 		AdGroupAd: &resources.AdGroupAd{
-			Ad: &resources.Ad{
-				FinalUrls: ad.FinalUrls,
-				AdData:    ad.AdData,
-			},
+			Ad: a,
 		},
 	})
 }
