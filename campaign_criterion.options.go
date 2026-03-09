@@ -8,15 +8,14 @@ import (
 
 type CampaignCriterionOption func(*resources.CampaignCriterion)
 
-func ChangeCampaignCriterionProximityRadius(lat, long int32, km float64) CampaignCriterionOption {
+func ChangeCampaignCriterionProximityRadius(address string, km float64) CampaignCriterionOption {
 	return func(cc *resources.CampaignCriterion) {
 		if criterion, ok := cc.GetCriterion().(*resources.CampaignCriterion_Proximity); ok {
 			criterion.Proximity = &common.ProximityInfo{
 				Radius:      &km,
 				RadiusUnits: enums.ProximityRadiusUnitsEnum_KILOMETERS,
-				GeoPoint: &common.GeoPointInfo{
-					LongitudeInMicroDegrees: &long,
-					LatitudeInMicroDegrees:  &lat,
+				Address: &common.AddressInfo{
+					StreetAddress: String(address),
 				},
 			}
 		}
