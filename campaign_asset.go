@@ -38,6 +38,7 @@ func (c *CampaignAssets) Add(asset *CampaignAsset, options ...AssetOption) {
 	a := &resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
 		FinalUrls: asset.Asset.GetFinalUrls(),
+		Name:      String(asset.Asset.GetName()),
 	}
 	for _, opt := range options {
 		opt(a)
