@@ -5,7 +5,7 @@ type AdGroupQueryBuilder struct {
 }
 
 func NewAdGroupQueryBuilder() *AdGroupQueryBuilder {
-	campaign := NewCampaignQueryBuilder()
+	campaign := NewCampaignQueryBuilder(false)
 	customer := NewCustomerQueryBuilder()
 
 	return &AdGroupQueryBuilder{NewQueryBuilder[AdGroupFilter]().

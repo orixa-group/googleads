@@ -7,11 +7,11 @@ import (
 )
 
 func FetchCampaign(ctx context.Context, customerId string, filters ...CampaignFilter) (*Campaign, error) {
-	return Fetch(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder().Where(filters...).Build(), createCampaignInstance)
+	return Fetch(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder(true).Where(filters...).Build(), createCampaignInstance)
 }
 
 func ListCampaigns(ctx context.Context, customerId string, filters ...CampaignFilter) (Campaigns, error) {
-	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder().Where(filters...).Build(), createCampaignInstance)
+	return List(ctx, services.NewGoogleAdsServiceClient(instance.conn), customerId, NewCampaignQueryBuilder(true).Where(filters...).Build(), createCampaignInstance)
 }
 
 func CreateCampaign(ctx context.Context, customer *Customer, campaign *Campaign) error {

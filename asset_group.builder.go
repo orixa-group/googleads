@@ -5,7 +5,7 @@ type AssetGroupQueryBuilder struct {
 }
 
 func NewAssetGroupQueryBuilder() *AssetGroupQueryBuilder {
-	campaign := NewCampaignQueryBuilder()
+	campaign := NewCampaignQueryBuilder(false)
 	customer := NewCustomerQueryBuilder()
 
 	return &AssetGroupQueryBuilder{NewQueryBuilder[AssetGroupFilter]().

@@ -4,13 +4,18 @@ type CampaignQueryBuilder struct {
 	*QueryBuilder[CampaignFilter]
 }
 
-func NewCampaignQueryBuilder() *CampaignQueryBuilder {
+func NewCampaignQueryBuilder(withBudget bool) *CampaignQueryBuilder {
 	budget := NewCampaignBudgetQueryBuilder()
 	customer := NewCustomerQueryBuilder()
 
+	fields := customer.fields
+	if withBudget {
+		fields = append(fields, budget.fields...)
+	}
+
 	return &CampaignQueryBuilder{NewQueryBuilder[CampaignFilter]().
 		Select(
-			append(append(budget.fields, customer.fields...),
+			append(fields,
 				"campaign.video_campaign_settings.video_ad_sequence.steps",
 				"campaign.video_campaign_settings.video_ad_sequence.minimum_duration",
 				"campaign.video_campaign_settings.video_ad_inventory_control.allow_shorts",
