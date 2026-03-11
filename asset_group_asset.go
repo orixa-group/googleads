@@ -35,11 +35,17 @@ func (aga *AssetGroupAsset) createOperations(assetGroup *AssetGroup, tempId temp
 type AssetGroupAssets []*AssetGroupAsset
 
 func (aga *AssetGroupAssets) Add(asset *AssetGroupAsset) {
+	a := &resources.Asset{
+		AssetData: asset.Asset.GetAssetData(),
+	}
+
+	if asset.Asset.Name != nil {
+		a.Name = String(asset.Asset.GetName())
+	}
+
 	*aga = append(*aga, &AssetGroupAsset{&resources.AssetGroupAsset{
 		FieldType: asset.GetFieldType(),
-	}, &Asset{&resources.Asset{
-		AssetData: asset.Asset.GetAssetData(),
-	}}})
+	}, &Asset{a}})
 }
 
 func (aga *AssetGroupAssets) AddHeadline(text string) {
