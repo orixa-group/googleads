@@ -244,6 +244,8 @@ func (c *Campaign) NewAdGroup(name string) *AdGroup {
 }
 
 func (c *Campaign) Create(ctx context.Context, customer *Customer) error {
+	c.Customer = customer
+
 	tempId := newTempIdGenerator()
 
 	ops := make([]*services.MutateOperation, 0)
