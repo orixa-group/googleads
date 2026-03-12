@@ -29,7 +29,9 @@ type CampaignCriteria []*CampaignCriterion
 
 func (c *CampaignCriteria) Add(criterion *CampaignCriterion, options ...CampaignCriterionOption) {
 	cc := &resources.CampaignCriterion{
-		Criterion: criterion.GetCriterion(),
+		Criterion:   criterion.GetCriterion(),
+		BidModifier: criterion.BidModifier,
+		Negative:    criterion.Negative,
 	}
 	for _, opt := range options {
 		opt(cc)
