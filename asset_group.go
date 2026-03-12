@@ -107,7 +107,14 @@ func (ag *AssetGroup) createOperations(tempId tempIdGenerator) []*services.Mutat
 	ops := make([]*services.MutateOperation, 0)
 
 	ops = append(ops, ag.createOperation(tempId))
-	ops = append(ops, ag.Assets.createOperations(ag, tempId)...)
+
+	for _, asset := range ag.Assets {
+		ops = append(ops, asset.Asset.createOperation(ag.Campaign.Customer, tempId))
+	}
+
+	for _, asset := range ag.Assets {
+		ops = append(ops, asset.createOperation(ag))
+	}
 
 	return ops
 }

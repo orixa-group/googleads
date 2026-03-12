@@ -12,20 +12,15 @@ type AssetGroupAsset struct {
 	Asset *Asset
 }
 
-func (aga *AssetGroupAsset) createOperations(assetGroup *AssetGroup, tempId tempIdGenerator) []*services.MutateOperation {
-	aop := aga.Asset.createOperation(assetGroup.Campaign.Customer, tempId)
-
+func (aga *AssetGroupAsset) createOperation(assetGroup *AssetGroup) *services.MutateOperation {
 	aga.AssetGroupAsset.AssetGroup = assetGroup.GetResourceName()
 	aga.AssetGroupAsset.Asset = aga.Asset.GetResourceName()
 
-	return []*services.MutateOperation{
-		aop,
-		{
-			Operation: &services.MutateOperation_AssetGroupAssetOperation{
-				AssetGroupAssetOperation: &services.AssetGroupAssetOperation{
-					Operation: &services.AssetGroupAssetOperation_Create{
-						Create: aga.AssetGroupAsset,
-					},
+	return &services.MutateOperation{
+		Operation: &services.MutateOperation_AssetGroupAssetOperation{
+			AssetGroupAssetOperation: &services.AssetGroupAssetOperation{
+				Operation: &services.AssetGroupAssetOperation_Create{
+					Create: aga.AssetGroupAsset,
 				},
 			},
 		},
@@ -112,10 +107,4 @@ func (aga *AssetGroupAssets) addImageAsset(source AssetImageSource, fieldType en
 		},
 	})
 	return nil
-}
-
-func (aga AssetGroupAssets) createOperations(assetGroup *AssetGroup, tempId tempIdGenerator) []*services.MutateOperation {
-	return Flatten(Map(aga, func(item *AssetGroupAsset) []*services.MutateOperation {
-		return item.createOperations(assetGroup, tempId)
-	}))
 }
