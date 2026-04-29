@@ -3,6 +3,7 @@ package googleads
 import (
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/shenzhencenter/google-ads-pb/common"
 	"github.com/shenzhencenter/google-ads-pb/resources"
@@ -22,6 +23,14 @@ func ChangeAssetURL(url string) AssetOption {
 	return func(a *resources.Asset) {
 		if data, ok := a.GetAssetData().(*resources.Asset_SitelinkAsset); ok {
 			data.SitelinkAsset.LinkText = url
+		}
+	}
+}
+
+func ReplaceWordInTextAsset(old, new string) AssetOption {
+	return func(a *resources.Asset) {
+		if data, ok := a.GetAssetData().(*resources.Asset_TextAsset); ok {
+			data.TextAsset.Text = String(strings.ReplaceAll(data.TextAsset.GetText(), old, new))
 		}
 	}
 }

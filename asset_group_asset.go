@@ -29,13 +29,17 @@ func (aga *AssetGroupAsset) createOperation(assetGroup *AssetGroup) *services.Mu
 
 type AssetGroupAssets []*AssetGroupAsset
 
-func (aga *AssetGroupAssets) Add(asset *AssetGroupAsset) {
+func (aga *AssetGroupAssets) Add(asset *AssetGroupAsset, options ...AssetOption) {
 	a := &resources.Asset{
 		AssetData: asset.Asset.GetAssetData(),
 	}
 
 	if asset.Asset.Name != nil {
 		a.Name = String(asset.Asset.GetName())
+	}
+
+	for _, opt := range options {
+		opt(a)
 	}
 
 	*aga = append(*aga, &AssetGroupAsset{&resources.AssetGroupAsset{
