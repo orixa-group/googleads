@@ -22,6 +22,7 @@ func ChangeAssetPhoneNumber(number string) AssetOption {
 func ChangeAssetURL(url string) AssetOption {
 	return func(a *resources.Asset) {
 		if data, ok := a.GetAssetData().(*resources.Asset_SitelinkAsset); ok {
+			a.FinalUrls = []string{url}
 			data.SitelinkAsset.LinkText = url
 		}
 	}
