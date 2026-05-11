@@ -162,6 +162,52 @@ func (c *Campaign) SetGeoTargetType(geoTargetType GeoTargetType) {
 	c.addUpdatedField("geo_target_type_setting.positive_geo_target_type")
 }
 
+func (c Campaign) GetAssetAutomationSettings() []AssetAutomationSetting {
+	raw := c.Campaign.GetAssetAutomationSettings()
+	settings := make([]AssetAutomationSetting, 0, len(raw))
+	for _, s := range raw {
+		settings = append(settings, AssetAutomationSetting{
+			Type:   enumToAssetAutomationType[s.GetAssetAutomationType()],
+			Status: enumToAssetAutomationStatus[s.GetAssetAutomationStatus()],
+		})
+	}
+	return settings
+}
+
+func (c *Campaign) DisableAllAssetAutomation() {
+	types := []AssetAutomationType{
+		AssetAutomationTypeTextAssets,
+		AssetAutomationTypeVerticalYouTubeVideos,
+		AssetAutomationTypeShorterYouTubeVideos,
+		AssetAutomationTypeLandingPagePreview,
+		AssetAutomationTypeEnhancedYouTubeVideos,
+		AssetAutomationTypeImageEnhancement,
+		AssetAutomationTypeImageExtraction,
+		AssetAutomationTypeDesignVersionsForImages,
+		AssetAutomationTypeFinalURLExpansion,
+		AssetAutomationTypeVideosFromOtherAssets,
+	}
+	settings := make([]AssetAutomationSetting, len(types))
+	for i, t := range types {
+		settings[i] = AssetAutomationSetting{Type: t, Status: AssetAutomationStatusOptedOut}
+	}
+	c.SetAssetAutomationSettings(settings)
+}
+
+func (c *Campaign) SetAssetAutomationSettings(settings []AssetAutomationSetting) {
+	proto := make([]*resources.Campaign_AssetAutomationSetting, 0, len(settings))
+	for _, s := range settings {
+		automationType := assetAutomationTypeToEnum[s.Type]
+		automationStatus := assetAutomationStatusToEnum[s.Status]
+		proto = append(proto, &resources.Campaign_AssetAutomationSetting{
+			AssetAutomationType:   &automationType,
+			AssetAutomationStatus: &automationStatus,
+		})
+	}
+	c.Campaign.AssetAutomationSettings = proto
+	c.addUpdatedField("asset_automation_settings")
+}
+
 func (c *Campaign) IsPMax() bool {
 	return c.GetChannelType().is(ChannelTypePerformanceMax)
 }

@@ -89,6 +89,77 @@ var geoTargetTypeToEnum = map[GeoTargetType]enums.PositiveGeoTargetTypeEnum_Posi
 }
 
 var enumToGeoTargetType = map[enums.PositiveGeoTargetTypeEnum_PositiveGeoTargetType]GeoTargetType{
-	enums.PositiveGeoTargetTypeEnum_SEARCH_INTEREST:     GeoTargetTypeInterest,
+	enums.PositiveGeoTargetTypeEnum_SEARCH_INTEREST:      GeoTargetTypeInterest,
 	enums.PositiveGeoTargetTypeEnum_PRESENCE_OR_INTEREST: GeoTargetTypePresenceOrInterest,
+}
+
+type AssetAutomationType string
+
+const (
+	AssetAutomationTypeTextAssets              AssetAutomationType = "TEXT_ASSET_AUTOMATION"
+	AssetAutomationTypeVerticalYouTubeVideos   AssetAutomationType = "GENERATE_VERTICAL_YOUTUBE_VIDEOS"
+	AssetAutomationTypeShorterYouTubeVideos    AssetAutomationType = "GENERATE_SHORTER_YOUTUBE_VIDEOS"
+	AssetAutomationTypeLandingPagePreview      AssetAutomationType = "GENERATE_LANDING_PAGE_PREVIEW"
+	AssetAutomationTypeEnhancedYouTubeVideos   AssetAutomationType = "GENERATE_ENHANCED_YOUTUBE_VIDEOS"
+	AssetAutomationTypeImageEnhancement        AssetAutomationType = "GENERATE_IMAGE_ENHANCEMENT"
+	AssetAutomationTypeImageExtraction         AssetAutomationType = "GENERATE_IMAGE_EXTRACTION"
+	AssetAutomationTypeDesignVersionsForImages AssetAutomationType = "GENERATE_DESIGN_VERSIONS_FOR_IMAGES"
+	AssetAutomationTypeFinalURLExpansion       AssetAutomationType = "FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION"
+	AssetAutomationTypeVideosFromOtherAssets   AssetAutomationType = "GENERATE_VIDEOS_FROM_OTHER_ASSETS"
+)
+
+func (a AssetAutomationType) String() string {
+	return string(a)
+}
+
+var assetAutomationTypeToEnum = map[AssetAutomationType]enums.AssetAutomationTypeEnum_AssetAutomationType{
+	AssetAutomationTypeTextAssets:              enums.AssetAutomationTypeEnum_TEXT_ASSET_AUTOMATION,
+	AssetAutomationTypeVerticalYouTubeVideos:   enums.AssetAutomationTypeEnum_GENERATE_VERTICAL_YOUTUBE_VIDEOS,
+	AssetAutomationTypeShorterYouTubeVideos:    enums.AssetAutomationTypeEnum_GENERATE_SHORTER_YOUTUBE_VIDEOS,
+	AssetAutomationTypeLandingPagePreview:      enums.AssetAutomationTypeEnum_GENERATE_LANDING_PAGE_PREVIEW,
+	AssetAutomationTypeEnhancedYouTubeVideos:   enums.AssetAutomationTypeEnum_GENERATE_ENHANCED_YOUTUBE_VIDEOS,
+	AssetAutomationTypeImageEnhancement:        enums.AssetAutomationTypeEnum_GENERATE_IMAGE_ENHANCEMENT,
+	AssetAutomationTypeImageExtraction:         enums.AssetAutomationTypeEnum_GENERATE_IMAGE_EXTRACTION,
+	AssetAutomationTypeDesignVersionsForImages: enums.AssetAutomationTypeEnum_GENERATE_DESIGN_VERSIONS_FOR_IMAGES,
+	AssetAutomationTypeFinalURLExpansion:       enums.AssetAutomationTypeEnum_FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION,
+	AssetAutomationTypeVideosFromOtherAssets:   enums.AssetAutomationTypeEnum_GENERATE_VIDEOS_FROM_OTHER_ASSETS,
+}
+
+var enumToAssetAutomationType = map[enums.AssetAutomationTypeEnum_AssetAutomationType]AssetAutomationType{
+	enums.AssetAutomationTypeEnum_TEXT_ASSET_AUTOMATION:                    AssetAutomationTypeTextAssets,
+	enums.AssetAutomationTypeEnum_GENERATE_VERTICAL_YOUTUBE_VIDEOS:         AssetAutomationTypeVerticalYouTubeVideos,
+	enums.AssetAutomationTypeEnum_GENERATE_SHORTER_YOUTUBE_VIDEOS:          AssetAutomationTypeShorterYouTubeVideos,
+	enums.AssetAutomationTypeEnum_GENERATE_LANDING_PAGE_PREVIEW:            AssetAutomationTypeLandingPagePreview,
+	enums.AssetAutomationTypeEnum_GENERATE_ENHANCED_YOUTUBE_VIDEOS:         AssetAutomationTypeEnhancedYouTubeVideos,
+	enums.AssetAutomationTypeEnum_GENERATE_IMAGE_ENHANCEMENT:               AssetAutomationTypeImageEnhancement,
+	enums.AssetAutomationTypeEnum_GENERATE_IMAGE_EXTRACTION:                AssetAutomationTypeImageExtraction,
+	enums.AssetAutomationTypeEnum_GENERATE_DESIGN_VERSIONS_FOR_IMAGES:      AssetAutomationTypeDesignVersionsForImages,
+	enums.AssetAutomationTypeEnum_FINAL_URL_EXPANSION_TEXT_ASSET_AUTOMATION: AssetAutomationTypeFinalURLExpansion,
+	enums.AssetAutomationTypeEnum_GENERATE_VIDEOS_FROM_OTHER_ASSETS:        AssetAutomationTypeVideosFromOtherAssets,
+}
+
+type AssetAutomationStatus string
+
+const (
+	AssetAutomationStatusOptedIn  AssetAutomationStatus = "OPTED_IN"
+	AssetAutomationStatusOptedOut AssetAutomationStatus = "OPTED_OUT"
+)
+
+func (a AssetAutomationStatus) String() string {
+	return string(a)
+}
+
+var assetAutomationStatusToEnum = map[AssetAutomationStatus]enums.AssetAutomationStatusEnum_AssetAutomationStatus{
+	AssetAutomationStatusOptedIn:  enums.AssetAutomationStatusEnum_OPTED_IN,
+	AssetAutomationStatusOptedOut: enums.AssetAutomationStatusEnum_OPTED_OUT,
+}
+
+var enumToAssetAutomationStatus = map[enums.AssetAutomationStatusEnum_AssetAutomationStatus]AssetAutomationStatus{
+	enums.AssetAutomationStatusEnum_OPTED_IN:  AssetAutomationStatusOptedIn,
+	enums.AssetAutomationStatusEnum_OPTED_OUT: AssetAutomationStatusOptedOut,
+}
+
+type AssetAutomationSetting struct {
+	Type   AssetAutomationType
+	Status AssetAutomationStatus
 }
