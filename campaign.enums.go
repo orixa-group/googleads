@@ -67,3 +67,28 @@ var enumToObjective = map[enums.BiddingStrategyTypeEnum_BiddingStrategyType]Obje
 	enums.BiddingStrategyTypeEnum_MAXIMIZE_CONVERSIONS: ObjectiveConversions,
 	enums.BiddingStrategyTypeEnum_TARGET_SPEND:         ObjectiveClicks,
 }
+
+type GeoTargetType string
+
+const (
+	GeoTargetTypeInterest          GeoTargetType = "INTEREST"
+	GeoTargetTypePresenceOrInterest GeoTargetType = "PRESENCE_OR_INTEREST"
+)
+
+func (g GeoTargetType) is(geoTargetType GeoTargetType) bool {
+	return strings.EqualFold(g.String(), geoTargetType.String())
+}
+
+func (g GeoTargetType) String() string {
+	return string(g)
+}
+
+var geoTargetTypeToEnum = map[GeoTargetType]enums.PositiveGeoTargetTypeEnum_PositiveGeoTargetType{
+	GeoTargetTypeInterest:           enums.PositiveGeoTargetTypeEnum_SEARCH_INTEREST,
+	GeoTargetTypePresenceOrInterest: enums.PositiveGeoTargetTypeEnum_PRESENCE_OR_INTEREST,
+}
+
+var enumToGeoTargetType = map[enums.PositiveGeoTargetTypeEnum_PositiveGeoTargetType]GeoTargetType{
+	enums.PositiveGeoTargetTypeEnum_SEARCH_INTEREST:     GeoTargetTypeInterest,
+	enums.PositiveGeoTargetTypeEnum_PRESENCE_OR_INTEREST: GeoTargetTypePresenceOrInterest,
+}

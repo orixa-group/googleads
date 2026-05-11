@@ -147,6 +147,21 @@ func (c *Campaign) SetEndDate(date string) {
 	c.addUpdatedField("end_date_time")
 }
 
+func (c Campaign) GetGeoTargetType() GeoTargetType {
+	if c.Campaign.GetGeoTargetTypeSetting() == nil {
+		return ""
+	}
+	return enumToGeoTargetType[c.Campaign.GetGeoTargetTypeSetting().GetPositiveGeoTargetType()]
+}
+
+func (c *Campaign) SetGeoTargetType(geoTargetType GeoTargetType) {
+	if c.Campaign.GeoTargetTypeSetting == nil {
+		c.Campaign.GeoTargetTypeSetting = &resources.Campaign_GeoTargetTypeSetting{}
+	}
+	c.Campaign.GeoTargetTypeSetting.PositiveGeoTargetType = geoTargetTypeToEnum[geoTargetType]
+	c.addUpdatedField("geo_target_type_setting.positive_geo_target_type")
+}
+
 func (c *Campaign) IsPMax() bool {
 	return c.GetChannelType().is(ChannelTypePerformanceMax)
 }
