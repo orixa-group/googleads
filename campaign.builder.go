@@ -25,7 +25,6 @@ func NewCampaignQueryBuilder(withBudget bool) *CampaignQueryBuilder {
 				"campaign.video_campaign_settings.video_ad_format_control.non_skippable_in_stream_restrictions.min_duration",
 				"campaign.video_campaign_settings.video_ad_format_control.non_skippable_in_stream_restrictions.max_duration",
 				"campaign.video_campaign_settings.video_ad_format_control.format_restriction",
-				"campaign.video_brand_safety_suitability",
 				"campaign.vanity_pharma.vanity_pharma_text",
 				"campaign.vanity_pharma.vanity_pharma_display_url_mode",
 				"campaign.url_custom_parameters",
